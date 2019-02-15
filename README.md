@@ -11,8 +11,8 @@ influenced by the Clojure programming language.
 
 ## Disclaimer
 Pure C++ is still in an experimental proof of concept stage. The library is
-only tested with clang 9.0.0 and gcc 8.2 at the moment and on Microsoft
-Visual Studio some features won't work.
+only tested with clang 9.0.0 and gcc 8.2 at the moment. Support for Microsoft
+Visual Studio is work in progress.
 
 ## Features
 
