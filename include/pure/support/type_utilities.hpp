@@ -82,3 +82,13 @@ namespace pure::detail {
 	template<typename T, typename C>
 	using inherit_once = std::conditional_t<std::is_base_of_v<C, T>, void_class, C>;
 }
+
+namespace pure {
+	template<typename Type>
+	struct static_instance {
+		static const Type instance;
+	};
+
+	template<typename Type>
+	const Type static_instance<Type>::instance {};
+}

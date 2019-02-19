@@ -1,7 +1,9 @@
 #pragma once
 
+#include <pure/support/type_utilities.hpp>
 #include <pure/type_class.hpp>
 #include <pure/traits.hpp>
+#include <pure/support/identifier.hpp>
 
 namespace pure {
 	template<typename T>
@@ -45,73 +47,73 @@ namespace pure {
 	/**
 	 constexpr set containing the value nullptr
 	 */
-	constexpr Nil_t Nil {};
+	constexpr auto Nil = static_instance<Nil_t>::instance;
 
 	using False_t = Category_t<Category_Id::False>;
 	/**
 	 constexpr set containing the value false
 	 */
-	constexpr False_t False {};
+	constexpr auto False = static_instance<False_t>::instance;
 
 	using True_t = Category_t<Category_Id::True>;
 	/**
 	 constexpr set containing the value true.
 	 */
-	constexpr True_t True {};
+	constexpr auto True = static_instance<True_t>::instance;
 
 	using Int_t = Category_t<Category_Id::Int>;
 	/**
 	 constexpr set of all integers
 	 */
-	constexpr Int_t Int {};
+	constexpr auto Int = static_instance<Int_t>::instance;
 
 	using Double_t = Category_t<Category_Id::Double>;
 	/**
 	 constexpr set of all double-percision floating point numbers
 	 */
-	constexpr Double_t Double {};
+	constexpr auto Double = static_instance<Double_t>::instance;
 
 	using Character_t = Category_t<Category_Id::Character>;
 	/**
 	 constexpr set of all unicode code points
 	 */
-	constexpr Character_t Character {};
+	constexpr auto Character = static_instance<Character_t>::instance;
 
 	using String_t = Category_t<Category_Id::String>;
 	/**
 	 constexpr set of all utf8 strings
 	 */
-	constexpr String_t String {};
+	constexpr auto String = static_instance<String_t>::instance;
 
 	using Any_Function_t = Category_t<Category_Id::Function>;
 	/**
 	 constexpr set of all values in the category Function
 	 */
-	constexpr Any_Function_t Any_Function {};
+	constexpr auto Any_Function = static_instance<Any_Function_t>::instance;
 
 	using Any_Set_t = Category_t<Category_Id::Set>;
 	/**
 	 constexpr set of all values in the category Set
 	 */
-	constexpr Any_Set_t Any_Set {};
+	constexpr auto Any_Set = static_instance<Any_Set_t>::instance;
 
 	using Any_Vector_t = Category_t<Category_Id::Vector>;
 	/**
 	 constexpr set of all values in the category Vector
 	 */
-	constexpr Any_Vector_t Any_Vector {};
+	constexpr auto Any_Vector = static_instance<Any_Vector_t>::instance;
 
 	using Error_t = Category_t<Category_Id::Error>;
 	/**
 	 constexpr set of all values in the category Error
 	 */
-	constexpr Error_t Error {};
+	constexpr auto Error = static_instance<Error_t>::instance;
 
 	using Object_t = Category_t<Category_Id::Object>;
 	/**
 	 constexpr set of all values in the category Object
 	 */
-	constexpr Object_t Object {};
+	constexpr auto Object = static_instance<Object_t>::instance;
 
 	template<typename... Sets>
 	struct Union_t : implements<Type_Class::Symbolic_Set> {
@@ -134,19 +136,19 @@ namespace pure {
 	 constexpr set that is the union of any number of constexpr sets
 	 */
 	template<const auto& ... Sets>
-	constexpr Union_t<deref_symbolic_set<decltype (Sets)>...> Union {};
+	constexpr auto Union = static_instance<Union_t<deref_symbolic_set<decltype (Sets)>...>>::instance;
 
 	using None_t = Union_t<>;
 	/**
 	 constexpr set that is the empty set
 	 */
-	constexpr None_t None {};
+	constexpr auto None = static_instance<None_t>::instance;
 
 	using Bool_t = Union_t<False_t, True_t>;
 	/**
 	 constexpr set that contains true and false
 	 */
-	constexpr Bool_t Bool {};
+	constexpr auto Bool = static_instance<Bool_t>::instance;
 
 	struct Any_t : implements<Type_Class::Symbolic_Set> {
 		template<typename T>
@@ -156,7 +158,7 @@ namespace pure {
 	/**
 	 constexpr set that contains all values.
 	 */
-	constexpr Any_t Any {};
+	constexpr auto Any = static_instance<Any_t>::instance;
 
 	template<intmax_t Min, intmax_t Max>
 	struct Ints_t : implements<Type_Class::Symbolic_Set> {
@@ -179,31 +181,37 @@ namespace pure {
 	 constexpr set that contains all integers [Min, ..., Max]
 	 */
 	template<intmax_t Min, intmax_t Max>
-	constexpr Ints_t<Min, Max> Ints {};
+	constexpr auto Ints = static_instance<Ints_t<Min, Max>>::instance;
 
 	using Byte_t = Ints_t<0, UINT8_MAX>;
 	/**
 	 constexpr set that contains all integers [0, ..., 255]
 	 */
-	constexpr Byte_t Byte {};
+	constexpr auto Byte = static_instance<Byte_t>::instance;
+
+	using Int8_t = Ints_t<INT8_MIN, INT8_MAX>;
 	/**
 	 constexpr set that contains all integers that fit in an int8_t
 	 */
-	constexpr Ints_t<INT8_MIN, INT8_MAX> Int8 {};
+	constexpr auto Int8 = static_instance<Int8_t>::instance;
+
+	using Int16_t = Ints_t<INT16_MIN, INT16_MAX>;
 	/**
 	 constexpr set that contains all integers that fit in an int16_t
 	 */
-	constexpr Ints_t<INT16_MIN, INT16_MAX> Int16 {};
+	constexpr auto Int16 = static_instance<Int16_t>::instance;
 
 	using Int32_t = Ints_t<INT32_MIN, INT32_MAX>;
 	/**
 	 constexpr set that contains all integers that fit in an int32_t
 	 */
-	constexpr Int32_t Int32 {};
+	constexpr auto Int32 = static_instance<Int32_t>::instance;
+
+	using Int64_t = Ints_t<INT64_MIN, INT64_MAX>;
 	/**
 	 constexpr set that contains all integers that fit in an int64_t
 	 */
-	constexpr Ints_t<INT64_MIN, INT64_MAX> Int64 {};
+	constexpr auto Int64 = static_instance<Int64_t>::instance;
 
 	template<typename... Args>
 	struct Function_t : implements<Type_Class::Symbolic_Set> {
@@ -224,7 +232,7 @@ namespace pure {
 	 constexpr set of functions, with some restriction on the domain and co-domain.
 	 */
 	template<const auto& ... Args>
-	constexpr Function_t<deref_symbolic_set<decltype (Args)>...> Function {};
+	constexpr auto Function = static_instance<Function_t<deref_symbolic_set<decltype (Args)>...>>::instance;
 
 	template<typename Elements>
 	struct Set_t : implements<Type_Class::Symbolic_Set> {
@@ -250,7 +258,7 @@ namespace pure {
 	 constexpr set of sets, with some restriction on the contained elements.
 	 */
 	template<const auto&... Elements>
-	constexpr Set_t<deref_symbolic_set<decltype (Elements)>...> Set {};
+	constexpr auto Set = static_instance<Set_t<deref_symbolic_set<decltype (Elements)>...>>::instance;
 
 	template<typename Elements>
 	struct Vector_t : implements<Type_Class::Symbolic_Set> {
@@ -276,7 +284,7 @@ namespace pure {
 	 constexpr set of vectors, with some restriction on the elements in the vector.
 	 */
 	template<const auto&... Elements>
-	constexpr Vector_t<deref_symbolic_set<decltype (Elements)>...> Vector {};
+	constexpr auto Vector = static_instance<Vector_t<deref_symbolic_set<decltype (Elements)>...>>::instance;
 
 	template<typename... Elements>
 	struct Tuple_t : implements<Type_Class::Symbolic_Set> {
@@ -309,7 +317,7 @@ namespace pure {
 	 constexpr set of vectors of a specific size and with some restrictions on the individual elements within it.
 	 */
 	template<const auto& ... Elements>
-	constexpr Tuple_t<deref_symbolic_set<decltype (Elements)>...> Tuple {};
+	constexpr auto Tuple = static_instance<Tuple_t<deref_symbolic_set<decltype (Elements)>...>>::instance;
 
 	template<typename I>
 	struct Id_t : implements<Type_Class::Symbolic_Set> {
@@ -347,5 +355,5 @@ namespace pure {
 	 can be restricted to a domain.
 	 */
 	template<const auto& ... Id_Values>
-	constexpr Record_t<deref_symbolic_set<decltype (Id_Values)>...> Record {};
+	constexpr auto Record = static_instance<Record_t<deref_symbolic_set<decltype (Id_Values)>...>>::instance;
 }

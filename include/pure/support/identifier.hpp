@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include <pure/support/type_utilities.hpp>
 #include <pure/type_class.hpp>
 
 namespace pure {
@@ -12,19 +13,11 @@ namespace pure {
 		operator const char* () const noexcept { return string; }
 	};
 
-	template<typename Type>
-	struct static_instance {
-		static const Type instance;
-	};
-
 	template<typename T>
 	struct is_static_id : std::false_type {};
 
 	template<char... Characters>
 	struct is_static_id<static_id<Characters...>> : std::true_type {};
-
-	template<typename Type>
-	const Type static_instance<Type>::instance {};
 }
 
 #if defined(__GNUC__) && !defined(__ICC)
@@ -129,7 +122,7 @@ namespace pure::detail {
 			pure::detail::string_max_length<DETAIL_PURE_CPP_STRING_64(str, 0), sizeof (str)>::type))
 
 
-#define STR(str) DETAIL_PURE_CPP_TYPE_STRING(str) {}
+#define STR(str) static_instance<DETAIL_PURE_CPP_TYPE_STRING(str)>::instance
 #define STR_t(str) DETAIL_PURE_CPP_TYPE_STRING(str)
 #endif
 
