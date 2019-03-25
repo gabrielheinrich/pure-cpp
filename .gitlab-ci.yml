@@ -1,0 +1,18 @@
+stages:
+    - test
+
+test_win:
+    stage: test
+    tags:
+        - win10
+    script:
+        - mkdir build
+        - cd build && cmake .. && cmake --build . --target check
+
+test_osx:
+    stage: test
+    tags:
+        - osx
+    script:
+        - mkdir build
+        - cd build && cmake .. && cmake --build . --target check
