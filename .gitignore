@@ -1,6 +1,7 @@
 /build
 /cmake-build-debug
 /doc/build
+/test_package/build
 .idea
 
 *.DS_Store

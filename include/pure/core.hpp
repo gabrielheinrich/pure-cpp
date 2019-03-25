@@ -1,5 +1,9 @@
 #pragma once
 
+#if __cplusplus <= 201402L
+#error "Pure C++ requires C++ 17 or higher. Please add the corresponding flags to your compiler invocation"
+#endif
+
 #include <pure/support/endian.hpp>
 #include <pure/support/type_utilities.hpp>
 #include <pure/support/utf8.hpp>
