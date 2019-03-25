@@ -33,6 +33,7 @@
 #include <pure/object/interface.hpp>
 #include <pure/object/boxed.hpp>
 #include <pure/object/basic_string.hpp>
+#include <pure/object/basic_vector.hpp>
 #include <pure/object/persistent_vector.hpp>
 #include <pure/object/persistent_map.hpp>
 

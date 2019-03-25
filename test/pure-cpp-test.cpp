@@ -272,6 +272,17 @@ TEST_CASE ("Persistent::Vector") {
 	}
 }
 
+TEST_CASE ("Basic::Vector") {
+	auto x = make_vector<int> (1, 2, 3, 4);
+	REQUIRE (x == VEC (1, 2, 3, 4));
+
+	REQUIRE (append (x, 5) == VEC (1, 2, 3, 4, 5));
+	REQUIRE (append (x, "5") == VEC (1, 2, 3, 4, "5"));
+
+	REQUIRE (set (x, 2, "3") == VEC (1, 2, "3", 4));
+	REQUIRE (set (x, 2, -3) == VEC (1, 2, -3, 4));
+}
+
 TEST_CASE ("Primitive Sets") {
 	SECTION ("Nil") {
 		REQUIRE (Nil (nullptr));
