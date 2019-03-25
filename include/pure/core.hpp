@@ -1,6 +1,12 @@
 #pragma once
 
-#if __cplusplus <= 201402L
+#if defined (_MSC_VER)
+#define __CPP_STD_ID _MSVC_LANG
+#else
+#define __CPP_STD_ID __cplusplus
+#endif
+
+#if __CPP_STD_ID <= 201402L
 #error "Pure C++ requires C++ 17 or higher. Please add the corresponding flags to your compiler invocation"
 #endif
 
