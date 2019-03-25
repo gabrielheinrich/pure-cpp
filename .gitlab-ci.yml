@@ -1,5 +1,6 @@
 stages:
     - test
+    - deploy
 
 test_win:
     stage: test
@@ -16,3 +17,13 @@ test_osx:
     script:
         - mkdir build
         - cd build && cmake .. && cmake --build . --target check
+
+deploy:
+    stage: deploy
+    tags:
+        - osx
+    script:
+        - conan remote add -f eden-elements-conan http://157.230.85.117:9300 false
+        - "conan user -p \"7n'=QG]Kiva{\" -r eden-elements-conan eden-elements"
+        - conan create . eden-elements/stable
+        - conan upload -r eden-elements-conan --all --confirm eden-elements-app*
