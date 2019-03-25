@@ -92,25 +92,25 @@ namespace pure {
 			}
 
 			const element_type& apply (intptr_t n) const { return self[n]; }
-			var virtual_apply (const any& n) const override { return apply (n); }
+			var virtual_apply (const var& n) const override { return apply (n); }
 
 			intptr_t arity () const noexcept override { return 1; }
 			bool Variadic () const noexcept override { return false; }
 
 			template<typename Index, typename Value>
-			immediate<Vector> set_persistent (const any&, const Index& index, Value&& value) const {
+			immediate<Vector> set_persistent (const var&, const Index& index, Value&& value) const {
 				return self.set (index, std::forward<Value> (value));
 			};
-			some<> virtual_set_persistent (const any&, any&& key, any&& value) const override {
+			some<> virtual_set_persistent (const var&, var&& key, var&& value) const override {
 				return set_persistent ({}, key, std::move (value));
 			}
 
 			template<typename Index, typename Value>
-			immediate<Vector> set_transient (const any&, const Index& index, Value&& value) {
+			immediate<Vector> set_transient (const var&, const Index& index, Value&& value) {
 				return std::move (self).set (index, std::forward<Value> (value));
 			};
 
-			maybe<> virtual_set_transient (any&&, any&& key, any&& value) override {
+			maybe<> virtual_set_transient (var&&, var&& key, var&& value) override {
 				return set_transient ({}, key, std::move (value));
 			}
 
@@ -154,18 +154,18 @@ namespace pure {
 			var virtual_nth (intptr_t n) const override { return nth (n); }
 
 			template<typename Value>
-			immediate<Vector> append_persistent (const any&, Value&& value) const {
+			immediate<Vector> append_persistent (const var&, Value&& value) const {
 				return self.push_back (std::forward<Value> (value));
 			}
-			some<> virtual_append_persistent (const any& self, any&& element) const override {
+			some<> virtual_append_persistent (const var& self, var&& element) const override {
 				return append_persistent ({}, std::move (element));
 			};
 
 			template<typename Value>
-			immediate<Vector> append_transient (const any&, Value&& value) {
+			immediate<Vector> append_transient (const var&, Value&& value) {
 				return std::move (self).push_back (std::forward<Value> (value));
 			}
-			maybe<> virtual_append_transient (any&& self, any&& element) override {
+			maybe<> virtual_append_transient (var&& self, var&& element) override {
 				return append_transient ({}, std::move (element));
 			};
 
@@ -173,7 +173,7 @@ namespace pure {
 			void print_to (Stream& stream) const {
 				detail::print_sequence_to (stream, enumerate ());
 			}
-			void virtual_print_to (any& stream) const override { this->print_to (stream); }
+			void virtual_print_to (var& stream) const override { this->print_to (stream); }
 
 		};
 

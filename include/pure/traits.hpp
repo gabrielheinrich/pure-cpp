@@ -91,7 +91,7 @@ namespace pure {
 	};
 
 	/**
-	Type utility, which returns a unified type of the argument types. The returned type can be initialized from any
+	Type utility, which returns a unified type of the argument types. The returned type can be initialized from var
 	type in the arguments.
 	 */
 	template<typename... Types> using unify_types = typename unify_types_t<Types...>::value;

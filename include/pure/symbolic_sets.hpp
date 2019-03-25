@@ -133,7 +133,7 @@ namespace pure {
 	};
 
 	/**
-	 constexpr set that is the union of any number of constexpr sets
+	 constexpr set that is the union of var number of constexpr sets
 	 */
 	template<const auto& ... Sets>
 	constexpr auto Union = static_instance<Union_t<deref_symbolic_set<decltype (Sets)>...>>::instance;

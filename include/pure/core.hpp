@@ -20,7 +20,6 @@
 #include <pure/exceptions.hpp>
 #include <pure/traits.hpp>
 
-#include <pure/types/any.hpp>
 #include <pure/types/var.hpp>
 #include <pure/types/restrict.hpp>
 #include <pure/types/some.hpp>

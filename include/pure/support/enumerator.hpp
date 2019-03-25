@@ -88,14 +88,14 @@ namespace pure {
 	template<typename T>
 	struct generic_enumerator_t;
 
-	struct alignas (16) generic_enumerator : enumerator_base<any> {
-		using value_type = any;
+	struct alignas (16) generic_enumerator : enumerator_base<var> {
+		using value_type = var;
 		char memory[12 * sizeof (intptr_t)];
 
 		template<typename T, typename = std::enable_if_t<!std::is_same_v<generic_enumerator, std::decay_t<T>>>>
 		generic_enumerator (T&& other) {
 			using enumerator_type = typename generic_enumerator_t<std::decay_t<T>>::value;
-			static_assert (std::is_base_of_v<Interface::Enumerator<any>, enumerator_type>);
+			static_assert (std::is_base_of_v<Interface::Enumerator<var>, enumerator_type>);
 			static_assert (sizeof (enumerator_type) <= sizeof (*this));
 			new (this) enumerator_type {std::forward<T> (other)};
 		}
@@ -110,14 +110,14 @@ namespace pure {
 
 		generic_enumerator& operator= (generic_enumerator& other) = delete;
 
-		const Interface::Enumerator<any>&
-		get () const { return *reinterpret_cast<const Interface::Enumerator<any>*> (this); }
-		Interface::Enumerator<any>& get () { return *reinterpret_cast<Interface::Enumerator<any>*> (this); }
+		const Interface::Enumerator<var>&
+		get () const { return *reinterpret_cast<const Interface::Enumerator<var>*> (this); }
+		Interface::Enumerator<var>& get () { return *reinterpret_cast<Interface::Enumerator<var>*> (this); }
 
 		bool empty () const noexcept { return get ().empty (); }
 		void next () { return get ().next (); }
-		const any& read () const { return get ().read (); }
-		any move () { return get ().move (); }
+		const var& read () const { return get ().read (); }
+		var move () { return get ().move (); }
 
 		bool has_size () const { return get ().has_size (); }
 		intptr_t size () const { return get ().size (); }
@@ -179,47 +179,47 @@ namespace pure {
 
 namespace pure {
 	template<typename T>
-	struct any_ref_enumerator : T {
-		using value_type = any;
+	struct var_ref_enumerator : T {
+		using value_type = var;
 
 		mutable immediate<Boxed<typename T::value_type*>> current;
 
 		template<typename... Args>
-		any_ref_enumerator (Args&& ... args) : T {std::forward<Args> (args)...}, current {} {}
+		var_ref_enumerator (Args&& ... args) : T {std::forward<Args> (args)...}, current {} {}
 
-		any_ref_enumerator (any_ref_enumerator& other)
+		var_ref_enumerator (var_ref_enumerator& other)
 				: T {static_cast<const T&>(other)}, current {} {}
 
-		any_ref_enumerator (const any_ref_enumerator& other)
+		var_ref_enumerator (const var_ref_enumerator& other)
 				: T {static_cast<const T&>(other)}, current {} {}
 
-		any_ref_enumerator (any_ref_enumerator&& other)
+		var_ref_enumerator (var_ref_enumerator&& other)
 				: T {static_cast<T&&>(other)}, current {} {}
 
 		void next () {
 			static_cast<T&>(*this).next ();
 		}
 
-		const any& read () const {
+		const var& read () const {
 			current->self = const_cast<typename T::value_type*>(&(static_cast<const T&>(*this).read ()));
 			return current;
 		}
 
-		any move () { return static_cast<T&>(*this).move (); }
+		var move () { return static_cast<T&>(*this).move (); }
 	};
 
 	template<typename T>
-	struct any_box_enumerator : T {
-		using value_type = any;
+	struct var_box_enumerator : T {
+		using value_type = var;
 		mutable var current;
 
 		template<typename... Args>
-		any_box_enumerator (Args&& ... args) : T {std::forward<Args> (args)...}, current {nullptr} {}
+		var_box_enumerator (Args&& ... args) : T {std::forward<Args> (args)...}, current {nullptr} {}
 
-		any_box_enumerator (const any_box_enumerator& other)
+		var_box_enumerator (const var_box_enumerator& other)
 				: T {static_cast<const T&>(other)}, current {other.current} {}
 
-		any_box_enumerator (any_box_enumerator&& other)
+		var_box_enumerator (var_box_enumerator&& other)
 				: T {static_cast<T&&>(other)}, current {std::move (other.current)} {}
 
 		void next () {
@@ -227,7 +227,7 @@ namespace pure {
 			static_cast<T&>(*this).next ();
 		}
 
-		const any& read () const {
+		const var& read () const {
 			if (current.tag () == Var::Tag::Nil) {
 				current = static_cast<const T&> (*this).read ();
 			}
@@ -242,15 +242,12 @@ namespace pure {
 		}
 	};
 
-	template<typename T>
-	using any_enumerator =
-	std::conditional_t<std::is_reference_v<decltype (std::declval<T> ().read ())>,
-			std::conditional_t<std::is_base_of_v<any, typename T::value_type>, T, any_ref_enumerator<T>>,
-			any_box_enumerator<T>>;
+	template<typename T> using var_enumerator =
+	std::conditional_t<std::is_reference_v<decltype (std::declval<T> ().read ())>, std::conditional_t<std::is_base_of_v<var, typename T::value_type>, T, var_ref_enumerator<T>>, var_box_enumerator<T>>;
 
 	template<typename T>
-	struct unique_enumerator : enumerator_base<any> {
-		using value_type = any;
+	struct unique_enumerator : enumerator_base<var> {
+		using value_type = var;
 
 		T* self;
 
@@ -272,9 +269,8 @@ namespace pure {
 
 	template<typename T>
 	struct generic_enumerator_t {
-		using value = std::conditional_t<
-				sizeof (Boxed_Enumerator<any_enumerator<T>, any>) <= sizeof (generic_enumerator),
-				Boxed_Enumerator<any_enumerator<T>, any>, Boxed_Enumerator<unique_enumerator<any_enumerator<T>>, any>>;
+		using value = std::conditional_t<sizeof (Boxed_Enumerator<var_enumerator<T>, var>) <=
+										 sizeof (generic_enumerator), Boxed_Enumerator<var_enumerator<T>, var>, Boxed_Enumerator<unique_enumerator<var_enumerator<T>>, var>>;
 
 	};
 }

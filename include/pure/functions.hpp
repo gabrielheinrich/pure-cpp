@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <pure/traits.hpp>
 #include <pure/support/string_builder.hpp>
-#include <pure/types/any.hpp>
+#include <pure/types/var.hpp>
 #include <pure/support/file_stream.hpp>
 #include <stdio.h>
 
@@ -48,7 +48,7 @@ namespace pure {
 	template<typename A, typename B>
 	auto concat (A&& lhs, B&& rhs) {
 		static_assert (Trait_Enumerable<B>::implemented);
-		any result = std::forward<A> (lhs);
+		var result = std::forward<A> (lhs);
 		for (auto enumerator = enumerate (rhs); !enumerator.empty (); enumerator.next ()) {
 			result = append (std::move (result), enumerator.read ());
 		}

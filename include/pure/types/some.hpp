@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pure/types/any.hpp>
+#include <pure/types/var.hpp>
 #include <pure/support/ref_count.hpp>
 #include <pure/support/create.hpp>
 
@@ -21,7 +21,7 @@ namespace pure {
 	 @tparam Nil Either never_nil or maybe_nil to specify whether nullptr should be included in the domain of this type.
 	 */
 	template<typename O = Interface::Value, typename Nil = never_nil>
-	struct some : any {
+	struct some : var {
 		using object_type = O;
 
 		using domain_t = std::conditional_t<Nil::is_never_nil, typename object_type::domain_t,
@@ -111,6 +111,6 @@ namespace pure {
 		const object_type& operator* () const noexcept { return *this->operator-> (); }
 		object_type& operator* () noexcept { return *this->operator-> (); }
 
-		object_type* release () noexcept { return static_cast<object_type*>(static_cast<any*>(this)->release ()); }
+		object_type* release () noexcept { return static_cast<object_type*>(static_cast<var*>(this)->release ()); }
 	};
 }

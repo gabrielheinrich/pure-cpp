@@ -57,7 +57,7 @@ namespace pure {
 template<typename T>
 struct Trait_To_Var<T, Type_Class::Int> : Trait_To_Var_Default_Clone<T, Boxed < int64_t>> {
 static constexpr Var::Tag tag (const T& self) {
-	return any::int_in_range (self) ? Var::Tag::Int : Var::Tag::Int64;
+	return var::int_in_range (self) ? Var::Tag::Int : Var::Tag::Int64;
 }
 
 static intptr_t get_int (const T& self) { return (intptr_t)self; }

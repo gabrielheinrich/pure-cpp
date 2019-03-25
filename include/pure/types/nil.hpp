@@ -1,9 +1,9 @@
 #pragma once
 
-#include <pure/types/any.hpp>
+#include <pure/types/var.hpp>
 
 namespace pure {
-	struct nil_t : any {
+	struct nil_t : var {
 		using domain_t = Nil_t;
 
 		nil_t () { this->init_nil (); };

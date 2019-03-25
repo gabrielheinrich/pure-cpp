@@ -24,16 +24,16 @@ TEST_CASE ("domain") {
 		REQUIRE (domain<char> ('a'));
 		REQUIRE (domain<char32_t> ('a'));
 		REQUIRE (domain<const char*> ("Hello World"));
-		REQUIRE (domain<const char*> (any ("Hello World")));
+		REQUIRE (domain<const char*> (var ("Hello World")));
 		REQUIRE (domain<FILE*> (stdin));
 		REQUIRE (domain<FILE*> (nullptr) == false);
 	} SECTION ("Value Holder Types") {
-		REQUIRE (domain<any> (nullptr));
-		REQUIRE (domain<any> (true));
-		REQUIRE (domain<any> (0));
-		REQUIRE (domain<any> (0.0));
-		REQUIRE (domain<any> ('a'));
-		REQUIRE (domain<any> ("Hello World"));
+		REQUIRE (domain<var> (nullptr));
+		REQUIRE (domain<var> (true));
+		REQUIRE (domain<var> (0));
+		REQUIRE (domain<var> (0.0));
+		REQUIRE (domain<var> ('a'));
+		REQUIRE (domain<var> ("Hello World"));
 		REQUIRE (domain<some<Basic::String>> ("Hello World"));
 		REQUIRE_FALSE (domain<some<Basic::String>> (0));
 		REQUIRE_FALSE (domain<some<Basic::String>> (nullptr));
@@ -73,8 +73,8 @@ TEST_CASE ("definitely_disjunct") {
 TEST_CASE ("restrict") {
 	REQUIRE_NOTHROW (restrict<int, Byte> {0});
 	REQUIRE_THROWS (restrict<int, Byte> {-1});
-	REQUIRE_NOTHROW (restrict<any, Byte> {0});
-	REQUIRE_THROWS (restrict<any, Byte> {-1});
+	REQUIRE_NOTHROW (restrict<var, Byte> {0});
+	REQUIRE_THROWS (restrict<var, Byte> {-1});
 }
 
 TEST_CASE ("unify_types") {
@@ -85,25 +85,25 @@ TEST_CASE ("unify_types") {
 	REQUIRE (std::is_same_v<unify_types<maybe<Basic::String>, shared<Basic::String>>, maybe<Basic::String>>);
 }
 
-TEST_CASE ("any") {
+TEST_CASE ("var") {
 	SECTION ("Constructor") {
-		REQUIRE (any{} == nullptr);
-		REQUIRE (any {nullptr} == nullptr);
-		REQUIRE (any {true} == true);
-		REQUIRE (any {0} == 0);
-		REQUIRE (any {1.0} == 1.0);
-		REQUIRE (any {'a'} == 'a');
-		REQUIRE (any {"String"} == "String");
-		REQUIRE (any {any {"String"}} == "String");
-		REQUIRE (any {static_cast<const any&> (any {"String"})} == "String");
-		REQUIRE (any {var {"String"}} == "String");
-		REQUIRE (any {static_cast<const var&> (var {"String"})} == "String");
-		REQUIRE (any {some<> {"String"}} == "String");
-		REQUIRE (any {static_cast<const some<>&> (some<> {"String"})} == "String");
+		REQUIRE (var{} == nullptr);
+		REQUIRE (var {nullptr} == nullptr);
+		REQUIRE (var {true} == true);
+		REQUIRE (var {0} == 0);
+		REQUIRE (var {1.0} == 1.0);
+		REQUIRE (var {'a'} == 'a');
+		REQUIRE (var {"String"} == "String");
+		REQUIRE (var {var {"String"}} == "String");
+		REQUIRE (var {static_cast<const var&> (var {"String"})} == "String");
+		REQUIRE (var {var {"String"}} == "String");
+		REQUIRE (var {static_cast<const var&> (var {"String"})} == "String");
+		REQUIRE (var {some<> {"String"}} == "String");
+		REQUIRE (var {static_cast<const some<>&> (some<> {"String"})} == "String");
 	}
 
 	SECTION ("Reassignment") {
-		any x = nullptr;
+		var x = nullptr;
 		REQUIRE (x == nullptr);
 		x = true;
 		REQUIRE (x == true);
@@ -124,39 +124,6 @@ TEST_CASE ("any") {
 	}
 }
 
-TEST_CASE ("var") {
-	SECTION ("Constructor") {
-		REQUIRE (var {nullptr} == nullptr);
-		REQUIRE (var {true} == true);
-		REQUIRE (var {0} == 0);
-		REQUIRE (var {1.0} == 1.0);
-		REQUIRE (var {'a'} == 'a');
-		REQUIRE (var {"String"} == "String");
-		REQUIRE (var {var {"String"}} == "String");
-		REQUIRE (var {static_cast<const var&> (var {"String"})} == "String");
-		REQUIRE (var {any {"String"}} == "String");
-	} SECTION ("Reassignment") {
-		var x = nullptr;
-		REQUIRE (x == nullptr);
-		x = true;
-		REQUIRE (x == true);
-		x = 0;
-		REQUIRE (x == 0);
-		x = 1.0;
-		REQUIRE (x == 1.0);
-		x = 'a';
-		REQUIRE (x == 'a');
-		x = "String";
-		REQUIRE (x == "String");
-		x = std::move (x);
-		REQUIRE (x == "String");
-		x = x;
-		REQUIRE (x == "String");
-		x = any {"String"};
-		REQUIRE (x == "String");
-	}
-}
-
 TEST_CASE ("some/maybe") {
 	SECTION ("Constructor") {
 		REQUIRE (some<> {true} == true);
@@ -164,13 +131,13 @@ TEST_CASE ("some/maybe") {
 		REQUIRE (some<> {1.0} == 1.0);
 		REQUIRE (some<> {'a'} == 'a');
 		REQUIRE (some<> {"String"} == "String");
-		REQUIRE (some<> {any {"String"}} == "String");
-		REQUIRE (some<> {static_cast<const any&>(any {"Heap Allocated String"})} == "Heap Allocated String");
+		REQUIRE (some<> {var {"String"}} == "String");
+		REQUIRE (some<> {static_cast<const var&>(var {"Heap Allocated String"})} == "Heap Allocated String");
 	}
 
 	SECTION ("Maybe") {
 		REQUIRE (maybe<> {nullptr} == nullptr);
-		REQUIRE (maybe<> {any {nullptr}} == nullptr);
+		REQUIRE (maybe<> {var {nullptr}} == nullptr);
 		REQUIRE (maybe<> {1} == 1);
 	}
 
@@ -191,8 +158,8 @@ TEST_CASE ("some/maybe") {
 		REQUIRE (x == "String");
 		x = x;
 		REQUIRE (x == "String");
-		x = any {"any"};
-		REQUIRE (x == "any");
+		x = var {"var"};
+		REQUIRE (x == "var");
 		x = var {"var"};
 		REQUIRE (x == "var");
 	}
@@ -200,7 +167,7 @@ TEST_CASE ("some/maybe") {
 	SECTION ("Typed") {
 		REQUIRE (some<Basic::String> {"String"} == "String");
 		REQUIRE (some<Basic::String> {some<> {"String"}} == "String");
-		REQUIRE (some<Basic::String> {any {"String"}} == "String");
+		REQUIRE (some<Basic::String> {var {"String"}} == "String");
 	}
 }
 
@@ -233,8 +200,8 @@ TEST_CASE ("unique") {
 		REQUIRE (x == "String");
 		x = x;
 		REQUIRE (x == "String");
-		x = any {"any"};
-		REQUIRE (x == "any");
+		x = var {"var"};
+		REQUIRE (x == "var");
 		x = var {"var"};
 		REQUIRE (x == "var");
 		decltype (x) other {"Other"};
@@ -272,8 +239,8 @@ TEST_CASE ("shared") {
 		REQUIRE (x == "String");
 		x = x;
 		REQUIRE (x == "String");
-		x = any {"any"};
-		REQUIRE (x == "any");
+		x = var {"var"};
+		REQUIRE (x == "var");
 		x = var {"var"};
 		REQUIRE (x == "var");
 		decltype (x) other {"Other"};
@@ -312,8 +279,8 @@ TEST_CASE ("Primitive Sets") {
 		REQUIRE_FALSE (Nil (false));
 	} SECTION ("Bool") {
 		REQUIRE (Bool (true));
-		REQUIRE (Bool (any {true}));
-		REQUIRE (any {Bool} (true));
+		REQUIRE (Bool (var {true}));
+		REQUIRE (var {Bool} (true));
 		REQUIRE_FALSE (Bool (nullptr));
 		REQUIRE (True (true));
 		REQUIRE_FALSE (True (false));
@@ -332,14 +299,14 @@ TEST_CASE ("Primitive Sets") {
 		REQUIRE_FALSE (Character (24));
 	} SECTION ("String") {
 		REQUIRE (String ("Hello"));
-		REQUIRE (String (any {"Hello"}));
+		REQUIRE (String (var {"Hello"}));
 		REQUIRE (String (string {"Hello"}));
 	}
 }
 
 TEST_CASE ("STR") {
 	REQUIRE (STR ("a") == "a");
-	REQUIRE (any {STR ("a")} == "a");
+	REQUIRE (var {STR ("a")} == "a");
 	REQUIRE (unique<> {STR ("a")} == "a");
 }
 
@@ -357,8 +324,8 @@ TEST_CASE ("Object Casting") {
 	struct A {};
 	struct B {};
 
-	REQUIRE_NOTHROW (obj_cast<const A&> (any {A {}}));
-	REQUIRE_THROWS (obj_cast<const A&> (any {B {}}));
+	REQUIRE_NOTHROW (obj_cast<const A&> (var {A {}}));
+	REQUIRE_THROWS (obj_cast<const A&> (var {B {}}));
 
 	shared<> x (A {});
 	REQUIRE_NOTHROW (obj_cast<A&> (x));
@@ -461,38 +428,38 @@ TEST_CASE ("boxed") {
 using namespace pure;
 
 TEST_CASE ("From Var") {
-	bool b = any {true};
+	bool b = var {true};
 	REQUIRE (b);
-	int i = any {-2};
+	int i = var {-2};
 	REQUIRE (i == -2);
-	double d = any {1.0};
+	double d = var {1.0};
 	REQUIRE (d == 1.0);
-	char32_t c = any {'a'};
+	char32_t c = var {'a'};
 	REQUIRE (c == 'a');
 
-	any s_ {"Hello"};
+	var s_ {"Hello"};
 	const char* s = s_;
 	REQUIRE (std::strcmp (s, "Hello") == 0);
 }
 
 TEST_CASE ("compare") {
-	REQUIRE (0 == any {0});
-	REQUIRE (any (1) == any {true});
+	REQUIRE (0 == var {0});
+	REQUIRE (var (1) == var {true});
 
-	REQUIRE (equal ("Hello", any {"Hello"}));
+	REQUIRE (equal ("Hello", var {"Hello"}));
 }
 
 TEST_CASE ("Arithmetic") {
-	REQUIRE (any (3) + any (8) == 11);
+	REQUIRE (var (3) + var (8) == 11);
 }
 
 TEST_CASE ("Functional") {
 	static_assert (Trait_Functional<char>::implemented == false);
 	REQUIRE (set ("Hello", 1, U'\U000000D8') == u8"H\U000000D8llo");
-	static_assert (Trait_Functional<any>::implemented);
-	REQUIRE (arity (any ("Hello")) == 1);
-	REQUIRE (set (any ("Hello"), 1, U'\U000000D8') == u8"H\U000000D8llo");
-	REQUIRE (set (any (""), 0, 'a') == "a");
+	static_assert (Trait_Functional<var>::implemented);
+	REQUIRE (arity (var ("Hello")) == 1);
+	REQUIRE (set (var ("Hello"), 1, U'\U000000D8') == u8"H\U000000D8llo");
+	REQUIRE (set (var (""), 0, 'a') == "a");
 
 	REQUIRE (apply (u8"Hell\U000000D8", 4) == U'\U000000D8');
 
@@ -510,11 +477,11 @@ TEST_CASE ("Enumerable") {
 	REQUIRE (nth ("Hello", 4) == 'o');
 	REQUIRE (append ("Hell", 'o') == "Hello");
 
-	REQUIRE (Enumerable (any ("Hello")));
-	REQUIRE (!Empty (any ("Hello")));
-	REQUIRE (Empty (any ("")));
-	REQUIRE (nth (any ("Hello"), 4) == 'o');
-	REQUIRE (append (any ("Hell"), 'o') == "Hello");
+	REQUIRE (Enumerable (var ("Hello")));
+	REQUIRE (!Empty (var ("Hello")));
+	REQUIRE (Empty (var ("")));
+	REQUIRE (nth (var ("Hello"), 4) == 'o');
+	REQUIRE (append (var ("Hell"), 'o') == "Hello");
 
 	REQUIRE (Enumerable (unique<> ("Hello")));
 	REQUIRE (!Empty (unique<> ("Hello")));
@@ -530,13 +497,13 @@ TEST_CASE ("fopen") {
 TEST_CASE ("Error") {
 	REQUIRE (to_string (operation_not_supported ()));
 	REQUIRE (Error (operation_not_supported ()));
-	REQUIRE (Error (any (operation_not_supported ())));
+	REQUIRE (Error (var (operation_not_supported ())));
 }
 
 TEST_CASE ("Function") {
-	any f = [] (int x) { return 2 * x; };
+	var f = [] (int x) { return 2 * x; };
 
-	any g = [] (const auto& x) { return 2 * x; };
+	var g = [] (const auto& x) { return 2 * x; };
 
 	REQUIRE (apply (f, 2) == 4);
 }
@@ -559,10 +526,10 @@ TEST_CASE ("Tuple") {
 	e.next ();
 	REQUIRE (e.read () == 2.0);
 
-	any x = tuple<> ();
+	var x = tuple<> ();
 	REQUIRE (Empty (x));
 
-	REQUIRE (nth (any (tuple<int> (1)), 0) == 1);
+	REQUIRE (nth (var (tuple<int> (1)), 0) == 1);
 }
 
 TEST_CASE ("Iterable") {
@@ -574,7 +541,7 @@ TEST_CASE ("Iterable") {
 	REQUIRE (equal (a, std::tuple<int, int, int, int> (1, 2, 3, 4)));
 	REQUIRE (to_string (a) == "[1, 2, 3, 4]");
 
-	REQUIRE (to_string (any (a)) == "[1, 2, 3, 4]");
+	REQUIRE (to_string (var (a)) == "[1, 2, 3, 4]");
 }
 
 TEST_CASE ("Record") {
@@ -592,7 +559,7 @@ TEST_CASE ("Record") {
 	auto y = make_record (STR ("y"), 2, STR ("x"), 1);
 	REQUIRE (x == y);
 	REQUIRE (to_string (x) == "{\"x\" : 1, \"y\" : 2}");
-	any x_ = x;
+	var x_ = x;
 	REQUIRE (x_ == x);
 }
 
@@ -645,7 +612,7 @@ TEST_CASE ("Readme") {
 
 	SECTION ("Domains") {
 		REQUIRE (domain<unique<Basic::String>> ("Hello World"));
-		REQUIRE_THROWS (restrict <any, Ints<0, 10>> {42});
+		REQUIRE_THROWS (restrict<var, Ints<0, 10>> {42});
 
 	}
 

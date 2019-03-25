@@ -217,7 +217,7 @@ namespace pure {
 		static bool Variadic (const T&) { return false; }
 
 		template<typename... Args>
-		static any set (const T&, Args&& ...) { throw operation_not_supported (); }
+		static var set (const T&, Args&& ...) { throw operation_not_supported (); }
 	};
 
 	template<typename T, typename R, intptr_t Arity, bool is_Variadic>
@@ -239,7 +239,7 @@ namespace pure {
 		static bool Variadic (const T&) { return is_Variadic; }
 
 		template<typename... Args>
-		static any set (const T&, Args&& ...) { throw operation_not_supported (); }
+		static var set (const T&, Args&& ...) { throw operation_not_supported (); }
 	};
 
 	template<typename T>
@@ -259,7 +259,7 @@ namespace pure {
 		static bool Variadic (const T&) { return false; }
 
 		template<typename... Args>
-		static any set (const T&, Args&& ...) { throw operation_not_supported (); }
+		static var set (const T&, Args&& ...) { throw operation_not_supported (); }
 	};
 
 	template<typename T, typename... Elements>

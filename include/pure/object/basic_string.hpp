@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pure/types/any.hpp>
+#include <pure/types/var.hpp>
 #include <pure/types/unique.hpp>
 #include <pure/object/interface.hpp>
 #include <pure/traits.hpp>
@@ -169,12 +169,12 @@ namespace pure {
 				return cstring_nth (cstring (), index);
 			};
 
-			var virtual_apply (const any& a0) const override { return apply (a0); }
+			var virtual_apply (const var& a0) const override { return apply (a0); }
 
 			intptr_t arity () const noexcept override { return 1; }
 			bool Variadic () const noexcept override { return false; }
 
-			unique<String> set_persistent (const any&, intptr_t index, char32_t c) const {
+			unique<String> set_persistent (const var&, intptr_t index, char32_t c) const {
 				const char* pos = str;
 				for (intptr_t i = 0; i < index; ++i) {
 					if (*pos == '\0') throw operation_not_supported (); // TODO out of bounds
@@ -189,11 +189,11 @@ namespace pure {
 				result->append_cstring (tail_begin, this->str_end - tail_begin);
 				return std::move (result);
 			};
-			some<> virtual_set_persistent (const any&, any&& key, any&& value) const override {
+			some<> virtual_set_persistent (const var&, var&& key, var&& value) const override {
 				return set_persistent ({}, key, value);
 			}
 
-			unique<String, maybe_nil> set_transient (any&&, intptr_t index, char32_t c) {
+			unique<String, maybe_nil> set_transient (var&&, intptr_t index, char32_t c) {
 				char* pos = str;
 				for (intptr_t i = 0; i < index; ++i) {
 					if (*pos == '\0') throw operation_not_supported (); // TODO out of bounds
@@ -225,7 +225,7 @@ namespace pure {
 				return nullptr;
 			};
 
-			maybe<> virtual_set_transient (any&&, any&& key, any&& value) override {
+			maybe<> virtual_set_transient (var&&, var&& key, var&& value) override {
 				return set_transient ({}, key, value);
 			}
 
@@ -246,17 +246,17 @@ namespace pure {
 			char32_t nth (intptr_t n) const { return cstring_nth (cstring (), n); }
 			var virtual_nth (intptr_t n) const override { return nth (n); }
 
-			unique<String> append_persistent (const any&, char32_t c) const {
+			unique<String> append_persistent (const var&, char32_t c) const {
 				auto new_capacity = capacity_needed_for_length (cstring_length () + 32);
 				auto result = create_from_cstring (new_capacity, cstring (), cstring_length ());
 				result->append_char (c);
 				return std::move (result);
 			}
-			some<> virtual_append_persistent (const any& self, any&& element) const override {
+			some<> virtual_append_persistent (const var& self, var&& element) const override {
 				return append_persistent ({}, std::move (element));
 			};
 
-			unique<String, maybe_nil> append_transient (any&&, char32_t c) {
+			unique<String, maybe_nil> append_transient (var&&, char32_t c) {
 				if (remaining_capacity () >= utf8::bytes_required_for (c)) {
 					this->append_char (c);
 					return nullptr;
@@ -264,7 +264,7 @@ namespace pure {
 				else return append_persistent ({}, c);
 			}
 
-			maybe<> virtual_append_transient (any&& self, any&& element) override {
+			maybe<> virtual_append_transient (var&& self, var&& element) override {
 				return append_transient ({}, std::move (element));
 			};
 
@@ -272,7 +272,7 @@ namespace pure {
 			void print_to (Stream& stream) const {
 				IO::print_to (stream, cstring ());
 			}
-			void virtual_print_to (any& stream) const override { this->print_to (stream); }
+			void virtual_print_to (var& stream) const override { this->print_to (stream); }
 		};
 	}
 }

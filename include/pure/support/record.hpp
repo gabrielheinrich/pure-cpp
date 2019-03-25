@@ -5,7 +5,7 @@
 #include <pure/support/tuple.hpp>
 #include <pure/support/identifier.hpp>
 #include <pure/traits.hpp>
-#include <pure/types/any.hpp>
+#include <pure/types/var.hpp>
 #include <pure/types/interned.hpp>
 
 namespace pure {

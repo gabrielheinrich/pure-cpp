@@ -93,13 +93,13 @@ int main() {
 	// # Gradual typesystem
 	// ******************************************************
 
-	// any is the most basic type to hold arbitrary values
-	any x = "Hello World";
-	any x_1 = 42;
-	any x_2 = VEC ("Hello", "World");
-	any x_3 = stdout;
+	// var is the most basic type to hold arbitrary values
+	var x = "Hello World";
+	var x_1 = 42;
+	var x_2 = VEC ("Hello", "World");
+	var x_3 = stdout;
 
-	// There are multiple other types, which all inherit from any, but add
+	// There are multiple other types, which all inherit from var, but add
 	// further restrictions
 
 	// uniquely owned heap allocated Object of unknown type
@@ -120,10 +120,6 @@ int main() {
 	// 'fully' typed string
 	unique<Basic::String> x_unique_string = "Hello World";
 
-	// var is similar to any but is 128bit in size and can therefore allocate
-	// 64bit integers and double values inplace
-	var x_var = 2.0;
-
 	// ******************************************************
 	// # Domains
 	// ******************************************************
@@ -132,16 +128,16 @@ int main() {
 	domain<unique<Basic::String>> ("Hello World"); // true
 
 	// A type's domain can be restricted
-	restrict <any, String> x_restricted = "Hello World"; // Ok
+	restrict<var, String> x_restricted = "Hello World"; // Ok
 
 	// Domains can be used for static and dynamic checking
 
 	// This wouldn't compile because domain<int> and String don't overlap
-	// restrict <any, String> x_restricted = 42; Static Error
+	// restrict <var, String> x_restricted = 42; Static Error
 
 	// This will compile, but throw an exception at runtime
 	try {
-		restrict <any, Ints<0, 10>> x_dyn_restricted = 42; // Dynamic Error
+		restrict<var, Ints<0, 10>> x_dyn_restricted = 42; // Dynamic Error
 	}
 	catch (...) { }
 

@@ -15,7 +15,6 @@ namespace pure {
 	template<typename O, typename Nil>
 	struct weak;
 
-	struct any;
 	struct var;
 
 	struct generic_enumerator;
@@ -88,9 +87,9 @@ namespace pure {
 			virtual int32_t hash () const { throw operation_not_supported (); }
 
 			virtual var virtual_apply () const { throw operation_not_supported (); }
-			virtual var virtual_apply (const any&) const { throw operation_not_supported (); }
-			virtual var virtual_apply (const any&, const any&) const { throw operation_not_supported (); }
-			virtual var virtual_apply (const any&, const any&, const any&) const { throw operation_not_supported (); }
+			virtual var virtual_apply (const var&) const { throw operation_not_supported (); }
+			virtual var virtual_apply (const var&, const var&) const { throw operation_not_supported (); }
+			virtual var virtual_apply (const var&, const var&, const var&) const { throw operation_not_supported (); }
 
 			template<typename... Args>
 			var apply (Args&& ... args) const { return virtual_apply (std::forward<Args> (args)...); }
@@ -98,19 +97,19 @@ namespace pure {
 			virtual intptr_t arity () const { throw operation_not_supported (); }
 			virtual bool Variadic () const noexcept { return false; }
 
-			virtual some<Value, never_nil> virtual_set_persistent (const any& self, any&& key, any&& value) const;
-			virtual some<Value, maybe_nil> virtual_set_transient (any&& self, any&& key, any&& value);
+			virtual some<Value, never_nil> virtual_set_persistent (const var& self, var&& key, var&& value) const;
+			virtual some<Value, maybe_nil> virtual_set_transient (var&& self, var&& key, var&& value);
 
 			template<typename... Args>
-			some<Value, never_nil> set_persistent (const any& self, Args&& ... args) const;
+			some<Value, never_nil> set_persistent (const var& self, Args&& ... args) const;
 			template<typename... Args>
-			some<Value, maybe_nil> set_transient (any&& self, Args&& ... args);
+			some<Value, maybe_nil> set_transient (var&& self, Args&& ... args);
 
-			virtual some<Value, never_nil> virtual_without_persistent (const any& self, const any& key) const;
-			virtual some<Value, maybe_nil> virtual_without_transient (any&& self, const any& key);
+			virtual some<Value, never_nil> virtual_without_persistent (const var& self, const var& key) const;
+			virtual some<Value, maybe_nil> virtual_without_transient (var&& self, const var& key);
 
-			some<Value, never_nil> without_persistent (const any& self, const any& key) const;
-			some<Value, maybe_nil> without_transient (any&& self, const any& key);
+			some<Value, never_nil> without_persistent (const var& self, const var& key) const;
+			some<Value, maybe_nil> without_transient (var&& self, const var& key);
 
 			virtual bool Enumerable () const noexcept { return false; }
 			virtual generic_enumerator virtual_enumerate () const;
@@ -128,19 +127,19 @@ namespace pure {
 			virtual var virtual_nth (intptr_t n) const;
 			var nth (intptr_t n) const;
 
-			virtual some<Value, never_nil> virtual_append_persistent (const any& self, any&& element) const;
-			virtual some<Value, maybe_nil> virtual_append_transient (any&& self, any&& element);
+			virtual some<Value, never_nil> virtual_append_persistent (const var& self, var&& element) const;
+			virtual some<Value, maybe_nil> virtual_append_transient (var&& self, var&& element);
 
 			template<typename Arg>
-			some<Value, never_nil> append_persistent (const any& self, Arg&& arg) const;
+			some<Value, never_nil> append_persistent (const var& self, Arg&& arg) const;
 			template<typename Arg>
-			some<Value, maybe_nil> append_transient (any&& self, Arg&& arg);
+			some<Value, maybe_nil> append_transient (var&& self, Arg&& arg);
 
 			// Error
 			virtual const char* error_message () const { throw operation_not_supported (); }
 
 			// Formatting
-			virtual void virtual_print_to (any& stream) const { throw operation_not_supported (); }
+			virtual void virtual_print_to (var& stream) const { throw operation_not_supported (); }
 			template<typename Stream>
 			void print_to (Stream& stream) const;
 
@@ -153,7 +152,6 @@ namespace pure {
 	}
 }
 
-#include <pure/types/any.hpp>
 #include <pure/types/var.hpp>
 #include <pure/types/some.hpp>
 #include <pure/types/maybe.hpp>
@@ -163,30 +161,30 @@ namespace pure {
 
 namespace pure::Interface {
 	inline some<Value, never_nil>
-	Value::virtual_set_persistent (const any& self, any&& key, any&& value) const { throw operation_not_supported (); }
-	inline some<Value, maybe_nil> Value::virtual_set_transient (any&& self, any&& key, any&& value) {
+	Value::virtual_set_persistent (const var& self, var&& key, var&& value) const { throw operation_not_supported (); }
+	inline some<Value, maybe_nil> Value::virtual_set_transient (var&& self, var&& key, var&& value) {
 		return virtual_set_persistent (self, std::move (key), std::move (value));
 	}
 
 	template<typename... Args>
-	inline some<Value, never_nil> Value::set_persistent (const any& self, Args&& ... args) const {
+	inline some<Value, never_nil> Value::set_persistent (const var& self, Args&& ... args) const {
 		return virtual_set_persistent (self, detail::move_or_copy (
 				std::forward<Args> (args))...);
 	}
 	template<typename... Args>
-	inline some<Value, maybe_nil> Value::set_transient (any&& self, Args&& ... args) {
+	inline some<Value, maybe_nil> Value::set_transient (var&& self, Args&& ... args) {
 		return virtual_set_transient (std::move (self), detail::move_or_copy (std::forward<Args> (args))...);
 	}
 
 	inline some<Value, never_nil>
-	Value::virtual_without_persistent (const any& self, const any& key) const { throw operation_not_supported (); }
+	Value::virtual_without_persistent (const var& self, const var& key) const { throw operation_not_supported (); }
 	inline some<Value, maybe_nil>
-	Value::virtual_without_transient (any&& self, const any& key) { return virtual_without_persistent (self, key); }
+	Value::virtual_without_transient (var&& self, const var& key) { return virtual_without_persistent (self, key); }
 
 	inline some<Value, never_nil>
-	Value::without_persistent (const any& self, const any& key) const { return virtual_without_persistent (self, key); }
+	Value::without_persistent (const var& self, const var& key) const { return virtual_without_persistent (self, key); }
 	inline some<Value, maybe_nil>
-	Value::without_transient (any&& self, const any& key) { return virtual_without_transient (std::move (self), key); }
+	Value::without_transient (var&& self, const var& key) { return virtual_without_transient (std::move (self), key); }
 
 	inline generic_enumerator Value::virtual_enumerate () const { throw operation_not_supported (); }
 	inline generic_enumerator Value::enumerate () const { return virtual_enumerate (); }
@@ -201,24 +199,24 @@ namespace pure::Interface {
 	inline var Value::nth (intptr_t n) const { return virtual_nth (n); }
 
 	inline some<Value, never_nil>
-	Value::virtual_append_persistent (const any& self, any&& element) const { throw operation_not_supported (); }
-	inline some<Value, maybe_nil> Value::virtual_append_transient (any&& self, any&& element) {
+	Value::virtual_append_persistent (const var& self, var&& element) const { throw operation_not_supported (); }
+	inline some<Value, maybe_nil> Value::virtual_append_transient (var&& self, var&& element) {
 		return virtual_append_persistent (self, std::move (element));
 	}
 
 	template<typename Arg>
-	inline some<Value, never_nil> Value::append_persistent (const any& self, Arg&& arg) const {
+	inline some<Value, never_nil> Value::append_persistent (const var& self, Arg&& arg) const {
 		return virtual_append_persistent (self, detail::move_or_copy (
 				std::forward<Arg> (arg)));
 	}
 	template<typename Arg>
-	inline some<Value, maybe_nil> Value::append_transient (any&& self, Arg&& arg) {
+	inline some<Value, maybe_nil> Value::append_transient (var&& self, Arg&& arg) {
 		return virtual_append_transient (std::move (self), detail::move_or_copy (std::forward<Arg> (arg)));
 	}
 
 	template<typename Stream>
 	void Value::print_to (Stream& stream) const {
-		if constexpr (std::is_base_of_v<any, Stream>)
+		if constexpr (std::is_base_of_v<var, Stream>)
 			return virtual_print_to (stream);
 		else {
 			if constexpr (!std::is_pointer_v<Stream>) {

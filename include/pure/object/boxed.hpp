@@ -12,7 +12,7 @@ namespace pure {
 	 */
 	template<typename T_>
 	struct Boxed : Interface::Value {
-		static_assert (!std::is_base_of_v<any, T_>);
+		static_assert (!std::is_base_of_v<var, T_>);
 		T_ self;
 		static constexpr bool is_pointer = std::is_pointer_v<T_> && !std::is_same_v<T_, FILE*>;
 
@@ -133,9 +133,9 @@ namespace pure {
 			throw operation_not_supported ();
 		}
 
-		var virtual_apply (const any& a0) const override {
+		var virtual_apply (const var& a0) const override {
 			if constexpr (is_Functional) {
-				if constexpr (pure::Applicable<T, const any&>) {
+				if constexpr (pure::Applicable<T, const var&>) {
 					if constexpr (std::is_void_v<decltype (pure::apply (get (), a0))>)
 						return pure::apply (get (), a0), nullptr;
 					else
@@ -145,9 +145,9 @@ namespace pure {
 			throw operation_not_supported ();
 		}
 
-		var virtual_apply (const any& a0, const any& a1) const override {
+		var virtual_apply (const var& a0, const var& a1) const override {
 			if constexpr (is_Functional) {
-				if constexpr (pure::Applicable<T, const any&, const any&>) {
+				if constexpr (pure::Applicable<T, const var&, const var&>) {
 					if constexpr (std::is_void_v<decltype (pure::apply (get (), a0, a1))>)
 						return pure::apply (get (), a0, a1), nullptr;
 					else
@@ -157,9 +157,9 @@ namespace pure {
 			throw operation_not_supported ();
 		}
 
-		var virtual_apply (const any& a0, const any& a1, const any& a2) const override {
+		var virtual_apply (const var& a0, const var& a1, const var& a2) const override {
 			if constexpr (is_Functional) {
-				if constexpr (pure::Applicable<T, const any&, const any&, const any&>) {
+				if constexpr (pure::Applicable<T, const var&, const var&, const var&>) {
 					if constexpr (std::is_void_v<decltype (pure::apply (get (), a0, a1, a2))>) {
 						return pure::apply (get (), a0, a1, a2), nullptr;
 					}
@@ -200,14 +200,14 @@ namespace pure {
 			else return false;
 		}
 
-		some<Value, never_nil> virtual_set_persistent (const any&, any&& key, any&& value) const override {
+		some <Value, never_nil> virtual_set_persistent (const var&, var&& key, var&& value) const override {
 			if constexpr (is_Functional)
 				return pure::set (get (), std::move (key), std::move (value));
 			else
 				throw operation_not_supported ();
 		};
 
-		some<Value, maybe_nil> virtual_set_transient (any&&, any&& key, any&& value) override {
+		some <Value, maybe_nil> virtual_set_transient (var&&, var&& key, var&& value) override {
 			if constexpr (is_Functional)
 				return pure::set (std::move (get ()), std::move (key), std::move (value));
 			else
@@ -215,7 +215,7 @@ namespace pure {
 		};
 
 		template<typename... Args>
-		auto set_persistent (const any&, Args&& ... args) const {
+		auto set_persistent (const var&, Args&& ... args) const {
 			if constexpr (is_Functional)
 				return pure::set (get (), std::forward<Args> (args)...);
 			else {
@@ -225,7 +225,7 @@ namespace pure {
 		}
 
 		template<typename... Args>
-		auto set_transient (any&&, Args&& ... args) {
+		auto set_transient (var&&, Args&& ... args) {
 			if constexpr (is_Functional)
 				return pure::set (std::move (get ()), std::forward<Args> (args)...);
 			else {
@@ -297,24 +297,24 @@ namespace pure {
 			else throw operation_not_supported ();
 		}
 
-		some<> virtual_append_persistent (const any&, any&& element) const override {
+		some<> virtual_append_persistent (const var&, var&& element) const override {
 			if constexpr (is_Enumerable) return pure::append (get (), std::move (element));
 			else throw operation_not_supported ();
 		}
 
-		maybe<> virtual_append_transient (any&&, any&& element) override {
+		maybe<> virtual_append_transient (var&&, var&& element) override {
 			if constexpr (is_Enumerable) return pure::append (std::move (get ()), std::move (element));
 			else throw operation_not_supported ();
 		}
 
 		template<typename Arg>
-		auto append_persistent (const any&, Arg&& element) const {
+		auto append_persistent (const var&, Arg&& element) const {
 			if constexpr (is_Enumerable) return pure::append (get (), std::forward<Arg> (element));
 			else throw operation_not_supported ();
 		}
 
 		template<typename Arg>
-		auto append_transient (any&&, Arg&& element) {
+		auto append_transient (var&&, Arg&& element) {
 			if constexpr (is_Enumerable) return pure::append (std::move (get ()), std::forward<Arg> (element));
 			else throw operation_not_supported ();
 		}
@@ -326,7 +326,7 @@ namespace pure {
 				throw operation_not_supported ();
 		}
 
-		void virtual_print_to (any& stream) const override {
+		void virtual_print_to (var& stream) const override {
 			return this->print_to (stream);
 		}
 

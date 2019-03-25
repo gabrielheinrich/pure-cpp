@@ -108,25 +108,25 @@ namespace pure {
 
 			template<typename K>
 			const value_type& apply (const K& key) const { return self.at (key); }
-			var virtual_apply (const any& key) const override { return apply (key); }
+			var virtual_apply (const var& key) const override { return apply (key); }
 
 			intptr_t arity () const noexcept override { return 1; }
 			bool Variadic () const noexcept override { return false; }
 
 			template<typename K, typename V>
-			immediate<Map> set_persistent (const any&, K&& key, V&& value) const {
+			immediate <Map> set_persistent (const var&, K&& key, V&& value) const {
 				return self.set (std::forward<K> (key), std::forward<V> (value));
 			};
-			some<> virtual_set_persistent (const any&, any&& key, any&& value) const override {
+			some<> virtual_set_persistent (const var&, var&& key, var&& value) const override {
 				return set_persistent ({}, std::move (key), std::move (value));
 			}
 
 			template<typename K, typename V>
-			immediate<Map> set_transient (const any&, K&& key, V&& value) {
+			immediate <Map> set_transient (const var&, K&& key, V&& value) {
 				return std::move (self).set (std::forward<K> (key), std::forward<V> (value));
 			};
 
-			maybe<> virtual_set_transient (any&&, any&& key, any&& value) override {
+			maybe<> virtual_set_transient (var&&, var&& key, var&& value) override {
 				return set_transient ({}, std::move (key), std::move (value));
 			}
 
@@ -177,7 +177,7 @@ namespace pure {
 			void print_to (Stream& stream) const {
 				detail::print_map_to (stream, enumerate ());
 			}
-			void virtual_print_to (any& stream) const override { this->print_to (stream); }
+			void virtual_print_to (var& stream) const override { this->print_to (stream); }
 
 		};
 
