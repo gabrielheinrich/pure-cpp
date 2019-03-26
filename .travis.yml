@@ -8,20 +8,44 @@ addons:
             - ubuntu-toolchain-r-test
         packages:
             - g++-8
+            - clang++-7
+
+stages:
+    - test
+    - deploy
 
 matrix:
     include:
         - os: linux
+          stage: test
           sudo: required
           compiler: gcc
         - os: osx
+          stage: test
           osx_image: xcode10
           sudo: required
           compiler: clang
         - os: windows
+          stage: test
+        - os: linux
+          stage: deploy
+          sudo: required
+          language: python
+          python: "3.6"
+          if: branch = master
+          env: CC=clang CXX=clang++
+          install:
+              - pip install conan
+          script :
+              - conan create . pure-cpp/stable
+          after_success:
+              - conan remote add bintray https://api.bintray.com/conan/pure-cpp/pure-cpp
+              - conan user -p ${BINTRAY_API_KEY} -r bintray pure-cpp
+              - conan upload --all -r bintray pure-cpp/0.0.1@pure-cpp/stable
+
 
 install:
-    - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
+    - if [[ $TRAVIS_OS_NAME = "inux" && $CXX = "g++" ]]; then export CXX="g++-8"; fi
     - if [[ $TRAVIS_OS_NAME = "linux" && $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
 
 script:
