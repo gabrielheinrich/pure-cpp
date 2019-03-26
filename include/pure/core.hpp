@@ -10,6 +10,8 @@
 #error "Pure C++ requires C++ 17 or higher. Please add the corresponding flags to your compiler invocation"
 #endif
 
+#include <pure/impl/Trait_Compare.hpp>
+
 #include <pure/support/endian.hpp>
 #include <pure/support/type_utilities.hpp>
 #include <pure/support/utf8.hpp>
@@ -28,7 +30,6 @@
 #include <pure/impl/Trait_From_Var.hpp>
 #include <pure/impl/Trait_CString.hpp>
 
-#include <pure/impl/Trait_Compare.hpp>
 #include <pure/impl/Trait_Hash.hpp>
 #include <pure/impl/Trait_Arithmetic.hpp>
 

@@ -1,23 +1,21 @@
 #pragma once
 
 #include <pure/traits.hpp>
-#include <pure/object/interface.hpp>
-#include <pure/symbolic_sets.hpp>
+#include <pure/types/var.hpp>
 #include <pure/support/utf8.hpp>
 #include <pure/support/tuple.hpp>
 
 namespace pure {
 	namespace detail {
 
-		template <typename LHS, typename RHS>
-		using simple_compare_type = decltype (LHS{0} + RHS{0});
+		template<typename LHS, typename RHS> using simple_compare_type = decltype (LHS{0} + RHS{0});
 
 		template<typename LHS, typename RHS>
-		int simple_compare (LHS lhs, RHS rhs) { 
+		int simple_compare (LHS lhs, RHS rhs) {
 			using T = simple_compare_type<LHS, RHS>;
-			auto lhs_ = (T)lhs;
-			auto rhs_ = (T)rhs;
-			return lhs_ < rhs_ ? -1 : lhs_ == rhs_ ? 0 : 1; 
+			auto lhs_ = (T) lhs;
+			auto rhs_ = (T) rhs;
+			return lhs_ < rhs_ ? -1 : lhs_ == rhs_ ? 0 : 1;
 		}
 
 		template<typename T>
@@ -25,7 +23,7 @@ namespace pure {
 
 		template<typename LHS, typename RHS>
 		int compare_equivalent_scalar (LHS lhs, const RHS& rhs) {
-			if constexpr (std::is_arithmetic_v<RHS>) {
+			if constexpr (std::is_arithmetic_v < RHS >) {
 				return simple_compare (lhs, rhs);
 			}
 			else {
@@ -34,15 +32,15 @@ namespace pure {
 					case False.id : return simple_compare (lhs, false);
 					case True.id : return simple_compare (lhs, true);
 					case Int.id :
-						if constexpr (std::is_convertible_v<RHS, int64_t>)
+						if constexpr (std::is_convertible_v < RHS, int64_t >)
 							return simple_compare (lhs, int64_t (rhs));
 						else break;
 					case Double.id :
-						if constexpr (std::is_convertible_v<RHS, double>)
+						if constexpr (std::is_convertible_v < RHS, double >)
 							return simple_compare (lhs, double (rhs));
 						else break;
 					case Character.id :
-						if constexpr (std::is_convertible_v<RHS, char32_t>)
+						if constexpr (std::is_convertible_v < RHS, char32_t >)
 							return simple_compare (lhs, char32_t (rhs));
 						else break;
 					default : return simple_compare (pure::category_id (lhs), rhs_category);
@@ -137,7 +135,7 @@ namespace pure {
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, LHS>) {
+			if constexpr (std::is_convertible_v < RHS, LHS >) {
 				return lhs == static_cast<LHS> (rhs);
 			}
 			else return false;
@@ -156,7 +154,7 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Int, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, int64_t>) {
+			if constexpr (std::is_convertible_v < RHS, int64_t >) {
 				if (pure::category_id (lhs) == Int.id) {
 					return int64_t (lhs) == int64_t (rhs);
 				}
@@ -166,7 +164,7 @@ namespace pure {
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, LHS>) {
+			if constexpr (std::is_convertible_v < RHS, LHS >) {
 				return lhs == static_cast<LHS> (rhs);
 			}
 			else return false;
@@ -174,7 +172,7 @@ namespace pure {
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
 			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v<RHS, int64_t>) {
+			if constexpr (std::is_convertible_v < RHS, int64_t >) {
 				if (rhs_category == Int.id)
 					return detail::simple_compare (int64_t (lhs), int64_t (rhs));
 			}
@@ -190,7 +188,7 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Double, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, double>) {
+			if constexpr (std::is_convertible_v < RHS, double >) {
 				if (pure::category_id (lhs) == Double.id) {
 					return double (lhs) == double (rhs);
 				}
@@ -200,7 +198,7 @@ namespace pure {
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, int64_t>) {
+			if constexpr (std::is_convertible_v < RHS, int64_t >) {
 				return lhs == static_cast<int64_t> (rhs);
 			}
 			else return false;
@@ -208,7 +206,7 @@ namespace pure {
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
 			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v<RHS, double>) {
+			if constexpr (std::is_convertible_v < RHS, double >) {
 				if (rhs_category == Double.id)
 					return detail::simple_compare (double (lhs), double (rhs));
 			}
@@ -224,7 +222,7 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Character, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, char32_t>) {
+			if constexpr (std::is_convertible_v < RHS, char32_t >) {
 				if (pure::category_id (lhs) == Character.id) {
 					return char32_t (lhs) == char32_t (rhs);
 				}
@@ -234,7 +232,7 @@ namespace pure {
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v<RHS, double>) {
+			if constexpr (std::is_convertible_v < RHS, double >) {
 				return lhs == static_cast<double> (rhs);
 			}
 			else return false;
@@ -242,7 +240,7 @@ namespace pure {
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
 			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v<RHS, char32_t>) {
+			if constexpr (std::is_convertible_v < RHS, char32_t >) {
 				if (rhs_category == Character.id)
 					return detail::simple_compare (char32_t (lhs), char32_t (rhs));
 			}
@@ -501,12 +499,11 @@ static bool equivalent (const LHS& lhs, const RHS& rhs) {
 }
 
 static int compare (const LHS& lhs, const RHS& rhs) {
-	return detail::tuple::do_compare<0, sizeof... (LHS_Elements), sizeof... (RHS_Elements)> (lhs, rhs,
-																							 pure::compare);
+	return detail::tuple::do_compare<0, sizeof... (LHS_Elements), sizeof... (RHS_Elements)> (lhs, rhs, pure::compare);
 }
 static int equivalent_compare (const LHS& lhs, const RHS& rhs) {
 	auto result = detail::tuple::do_compare<0, sizeof... (LHS_Elements), sizeof... (RHS_Elements)> (lhs, rhs,
-																							 pure::equivalent_compare );
+																									pure::equivalent_compare);
 	return result;
 }
 };
@@ -595,6 +592,11 @@ struct Trait_Compare<LHS, RHS, Type_Class::Sequence, RHS_Type_Class> : Trait_Def
 	}
 };
 
+}
+
+#include <pure/support/record.hpp>
+
+namespace pure {
 template<typename LHS, typename RHS, typename RHS_Type_Class>
 struct Trait_Compare<LHS, RHS, Type_Class::Record, RHS_Type_Class> : Trait_Definition {
 	static constexpr bool comparable = false;

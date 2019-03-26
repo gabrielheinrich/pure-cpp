@@ -103,8 +103,8 @@ namespace pure {
 		}
 
 		char32_t get_char () const noexcept { return get_int (); }
-		double get_double () const noexcept;
-		int64_t get_int64 () const noexcept;
+		double get_double () const;
+		int64_t get_int64 () const;
 
 		const char* get_cstring () const noexcept {
 			return reinterpret_cast<const char*>(&value) + 1;

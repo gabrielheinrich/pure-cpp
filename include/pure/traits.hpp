@@ -218,8 +218,6 @@ namespace pure {
 		struct builtin_equivalent<Type_Class::Double> : std::true_type {};
 		template<>
 		struct builtin_equivalent<Type_Class::Character> : std::true_type {};
-		template<>
-		struct builtin_equivalent<Type_Class::CString> : std::true_type {};
 	}
 
 	/**
