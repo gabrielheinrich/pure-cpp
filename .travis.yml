@@ -8,7 +8,6 @@ addons:
             - ubuntu-toolchain-r-test
         packages:
             - g++-8
-            - clang-7
 
 matrix:
     include:
@@ -16,12 +15,13 @@ matrix:
           sudo: required
           compiler: gcc
         - os: osx
+          osx_image: xcode10
           sudo: required
           compiler: clang
 
 install:
-    - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
-    - if [[ $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
+    - if [[ $CXX = "g++" ]]; then export CXX="g++-8.2"; fi
+    - if [[ $TRAVIS_OS_NAME = "linux" && $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
 
 script:
     - cmake . -Bbuild

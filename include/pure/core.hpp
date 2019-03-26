@@ -20,6 +20,25 @@
 #include <pure/exceptions.hpp>
 #include <pure/traits.hpp>
 
+#include <pure/impl/Trait_Value.hpp>
+#include <pure/impl/Trait_Static_Disjunct.hpp>
+#include <pure/impl/Trait_Type_Variants.hpp>
+#include <pure/impl/Trait_Type_Union.hpp>
+#include <pure/impl/Trait_To_Var.hpp>
+#include <pure/impl/Trait_From_Var.hpp>
+#include <pure/impl/Trait_CString.hpp>
+
+#include <pure/impl/Trait_Compare.hpp>
+#include <pure/impl/Trait_Hash.hpp>
+#include <pure/impl/Trait_Arithmetic.hpp>
+
+#include <pure/impl/Trait_Functional.hpp>
+#include <pure/impl/Trait_Enumerable.hpp>
+#include <pure/impl/Trait_Error.hpp>
+#include <pure/impl/Trait_Print.hpp>
+#include <pure/impl/Trait_Stream.hpp>
+#include <pure/impl/Trait_Object.hpp>
+
 #include <pure/types/var.hpp>
 #include <pure/types/restrict.hpp>
 #include <pure/types/some.hpp>
@@ -38,28 +57,6 @@
 #include <pure/object/persistent_map.hpp>
 
 #include <pure/support/identifier.hpp>
-
-#include <pure/impl/Trait_Value.hpp>
-#include <pure/impl/Trait_Static_Disjunct.hpp>
-#include <pure/impl/Trait_Type_Variants.hpp>
-#include <pure/impl/Trait_Type_Union.hpp>
-#include <pure/impl/Trait_To_Var.hpp>
-#include <pure/impl/Trait_From_Var.hpp>
-#include <pure/impl/Trait_CString.hpp>
-
-#include <pure/impl/Trait_Compare.hpp>
-#include <pure/impl/Trait_Hash.hpp>
-#include <pure/impl/Trait_Arithmetic.hpp>
-
-#include <pure/impl/Trait_Functional.hpp>
-#include <pure/impl/Trait_Enumerable.hpp>
-
-#include <pure/impl/Trait_Error.hpp>
-
-#include <pure/impl/Trait_Print.hpp>
-#include <pure/impl/Trait_Stream.hpp>
-#include <pure/impl/Trait_Object.hpp>
-
 #include <pure/support/string_builder.hpp>
 
 #include <pure/constructors.hpp>
