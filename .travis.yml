@@ -3,7 +3,7 @@ language: cpp
 addons:
     apt:
         sources:
-            - llvm-toolchain-xenial-y
+            - llvm-toolchain-xenial-7
             - ubuntu-toolchain-r-test
         packages:
             - g++-8
