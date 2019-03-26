@@ -27,6 +27,7 @@ matrix:
           compiler: clang
         - os: windows
           stage: test
+          filter_secrets: false
         - os: linux
           stage: deploy
           sudo: required
