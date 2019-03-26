@@ -28,13 +28,14 @@ matrix:
         - os: windows
           stage: test
           filter_secrets: false
-        - os: linux
+        - os: osx
           stage: deploy
+          osx_image: xcode10
           sudo: required
+          compiler: clang
           language: python
           python: "3.6"
           if: branch = master
-          env: CC=clang CXX=clang++
           install:
               - pip install conan
           script :
