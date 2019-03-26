@@ -23,5 +23,5 @@ install:
     - if [[ $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
 
 script:
-    - cmake -S. -Bbuild
+    - cmake -S./ -Bbuild
     - cmake --build build --target check
