@@ -2,9 +2,12 @@ language: cpp
 
 addons:
     apt:
+        sources:
+            - llvm-toolchain-xenial-y
+            - ubuntu-toolchain-r-test
         packages:
-            - clang-7
             - g++-8
+            - clang-7
 
 matrix:
     include:
@@ -14,9 +17,11 @@ matrix:
         - os: osx
           sudo: required
           compiler: clang
-    install:
-        - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
-        - if [[ $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
-    script:
-        - cmake -S. -Bbuild
-        - cmake --build build --target check
+
+install:
+    - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
+    - if [[ $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
+
+script:
+    - cmake -S. -Bbuild
+    - cmake --build build --target check
