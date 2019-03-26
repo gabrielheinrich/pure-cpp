@@ -18,6 +18,7 @@ matrix:
           osx_image: xcode10
           sudo: required
           compiler: clang
+        - os: windows
 
 install:
     - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
