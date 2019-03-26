@@ -45,7 +45,7 @@ matrix:
 
 
 install:
-    - if [[ $TRAVIS_OS_NAME = "linux" && $CXX = "g++" ]]; then export CXX="g++-8"; fi
+    - if [[ $CXX = "g++" ]]; then export CXX="g++-8"; fi
     - if [[ $TRAVIS_OS_NAME = "linux" && $CXX = "clang++" ]]; then export CXX="clang++-7"; fi
 
 script:
