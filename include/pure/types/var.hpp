@@ -261,10 +261,10 @@ namespace pure {
 		}
 	}
 
-	inline double var::get_double () const noexcept {
+	inline double var::get_double () const {
 		throw 0;
 	}
-	inline int64_t var::get_int64 () const noexcept {
+	inline int64_t var::get_int64 () const {
 		throw 0;
 	}
 
