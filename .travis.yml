@@ -33,8 +33,6 @@ matrix:
           osx_image: xcode10
           sudo: required
           compiler: clang
-          language: python
-          python: "3.6"
           if: branch = master
           install:
               - pip install conan
