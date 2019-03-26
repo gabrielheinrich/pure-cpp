@@ -532,7 +532,9 @@ TEST_CASE ("Tuple") {
 	REQUIRE (count (tuple<int> (1)) == 1);
 	REQUIRE (nth (tuple<int> (1), 0) == 1);
 
-	generic_enumerator e = enumerate (tuple<int, double> (1, 2.0));
+
+	auto t = tuple<int,double> (1, 2.0);
+	generic_enumerator e = enumerate (t);
 	REQUIRE (e.read () == 1);
 	e.next ();
 	REQUIRE (e.read () == 2.0);
