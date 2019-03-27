@@ -13,8 +13,10 @@ namespace pure {
 	template<typename T_>
 	struct Boxed : Interface::Value {
 		static_assert (!std::is_base_of_v<var, T_>);
+		static_assert (!std::is_arithmetic_v<T_>);
 		T_ self;
-		static constexpr bool is_pointer = std::is_pointer_v<T_> && !std::is_same_v<T_, FILE*>;
+		static constexpr bool is_pointer = std::is_pointer_v<T_> && !std::is_same_v<T_, FILE*> && !std::is_same_v<T_,
+				const char*>;
 
 		using T = std::conditional_t<is_pointer, std::remove_pointer_t<T_>, T_>;
 
@@ -57,25 +59,6 @@ namespace pure {
 		Value* clone_placement (void* memory, intptr_t num_bytes)&& override {
 			if constexpr (is_pointer) return new (memory) Boxed<T> {*self};
 			else return new (memory) Boxed {std::move (self)};
-		}
-
-		int64_t get_int64 () const override {
-			if constexpr (std::is_convertible_v<T, int64_t>)
-				return static_cast<int64_t> (get ());
-			else throw operation_not_supported ();
-		}
-
-		double get_double () const override {
-			if constexpr (std::is_convertible_v<T, double>)
-				return static_cast<double> (get ());
-			else throw operation_not_supported ();
-		}
-
-		bool get_bool () const noexcept override {
-			if constexpr (std::is_convertible_v<T, bool>)
-				return static_cast<bool> (get ());
-			else
-				return true;
 		}
 
 		const char* cstring () const override {

@@ -17,7 +17,6 @@ namespace pure {
 					case Var::Tag::Int64 : return (T)self.get_int64 ();
 					case Var::Tag::Double : return (T)self.get_double ();
 					case Var::Tag::Char : return (T)self.get_char ();
-					case Var_Tag_Pointer : return (T)self->get_bool ();
 					default : return true;
 				}
 			}
@@ -39,7 +38,6 @@ namespace pure {
 					case Var::Tag::Int64 : return (T)self.get_int64 ();
 					case Var::Tag::Double : return (T)self.get_double ();
 					case Var::Tag::Char : return (T)self.get_char ();
-					case Var_Tag_Pointer : return (T)self->get_int64 ();
 					default : throw operation_not_supported ();
 				}
 			}
@@ -61,7 +59,6 @@ namespace pure {
 					case Var::Tag::Int64 : return (T)self.get_int64 ();
 					case Var::Tag::Double : return (T)self.get_double ();
 					case Var::Tag::Char : return (T)self.get_char ();
-					case Var_Tag_Pointer : return (T)self->get_double ();
 					default : throw operation_not_supported ();
 				}
 			}
@@ -83,7 +80,6 @@ namespace pure {
 					case Var::Tag::Int64 : return (T)self.get_int64 ();
 					case Var::Tag::Double : return (T)self.get_double ();
 					case Var::Tag::Char : return (T)self.get_char ();
-					case Var_Tag_Pointer : return (T)self->get_int64 ();
 					default : throw operation_not_supported ();
 				}
 			}

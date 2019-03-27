@@ -23,29 +23,39 @@ namespace pure {
 
 		template<typename LHS, typename RHS>
 		int compare_equivalent_scalar (LHS lhs, const RHS& rhs) {
+			static_assert (std::is_arithmetic_v<LHS>);
 			if constexpr (std::is_arithmetic_v < RHS >) {
 				return simple_compare (lhs, rhs);
 			}
 			else {
-				auto rhs_category = pure::category_id (rhs);
-				switch (rhs_category) {
-					case False.id : return simple_compare (lhs, false);
-					case True.id : return simple_compare (lhs, true);
-					case Int.id :
-						if constexpr (std::is_convertible_v < RHS, int64_t >)
-							return simple_compare (lhs, int64_t (rhs));
-						else break;
-					case Double.id :
-						if constexpr (std::is_convertible_v < RHS, double >)
-							return simple_compare (lhs, double (rhs));
-						else break;
-					case Character.id :
-						if constexpr (std::is_convertible_v < RHS, char32_t >)
-							return simple_compare (lhs, char32_t (rhs));
-						else break;
-					default : return simple_compare (pure::category_id (lhs), rhs_category);
+				switch (Var::tag (rhs)) {
+					case Var::Tag::False : return simple_compare (lhs, false);
+					case Var::Tag::True : return simple_compare (lhs, true);
+					case Var::Tag::Int : return simple_compare (lhs, Var::get_int (rhs));
+					case Var::Tag::Int64 : return simple_compare (lhs, Var::get_int64 (rhs));
+					case Var::Tag::Double : return simple_compare (lhs, Var::get_double (rhs));
+					case Var::Tag::Char: return simple_compare (lhs, Var::get_char (rhs));
+					default: return false;
 				}
-				throw operation_not_supported ();
+			}
+		};
+
+		template<typename LHS, typename RHS>
+		int equivalent_scalar (LHS lhs, const RHS& rhs) {
+			static_assert (std::is_arithmetic_v<LHS>);
+			if constexpr (std::is_arithmetic_v < RHS >) {
+				return lhs == rhs;
+			}
+			else {
+				switch (Var::tag (rhs)) {
+					case Var::Tag::False : return lhs == false;
+					case Var::Tag::True : return lhs == true;
+					case Var::Tag::Int : return lhs == Var::get_int (rhs);
+					case Var::Tag::Int64 : return lhs == Var::get_int64 (rhs);
+					case Var::Tag::Double : return lhs == Var::get_double (rhs);
+					case Var::Tag::Char: return lhs == Var::get_char (rhs);
+					default : return false;
+				}
 			}
 		};
 
@@ -131,14 +141,11 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Bool, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			return pure::category_id (lhs) == pure::category_id (rhs);
+			return Var::tag (lhs) == Var::tag (rhs);
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, LHS >) {
-				return lhs == static_cast<LHS> (rhs);
-			}
-			else return false;
+			return detail::equivalent_scalar (lhs, rhs);
 		}
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
@@ -154,29 +161,23 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Int, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, int64_t >) {
-				if (pure::category_id (lhs) == Int.id) {
-					return int64_t (lhs) == int64_t (rhs);
-				}
-				return false;
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Int : return lhs == Var::get_int (rhs);
+				case Var::Tag::Int64 : return lhs == Var::get_int64 (rhs);
+				default :return false;
 			}
-			return false;
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, LHS >) {
-				return lhs == static_cast<LHS> (rhs);
-			}
-			else return false;
+			return detail::equivalent_scalar (lhs, rhs);
 		}
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
-			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v < RHS, int64_t >) {
-				if (rhs_category == Int.id)
-					return detail::simple_compare (int64_t (lhs), int64_t (rhs));
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Int : return detail::simple_compare (lhs, Var::get_int (rhs));
+				case Var::Tag::Int64 : return detail::simple_compare (lhs, Var::get_int64 (rhs));
+				default :return detail::simple_compare (Int.id, pure::category_id (rhs));
 			}
-			return detail::simple_compare (Int.id, rhs_category);
 		}
 
 		static int equivalent_compare (const LHS& lhs, const RHS& rhs) {
@@ -188,29 +189,21 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Double, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, double >) {
-				if (pure::category_id (lhs) == Double.id) {
-					return double (lhs) == double (rhs);
-				}
-				return false;
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Double : return lhs == Var::get_double (rhs);
+				default : return false;
 			}
-			return false;
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, int64_t >) {
-				return lhs == static_cast<int64_t> (rhs);
-			}
-			else return false;
+			return detail::equivalent_scalar (lhs, rhs);
 		}
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
-			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v < RHS, double >) {
-				if (rhs_category == Double.id)
-					return detail::simple_compare (double (lhs), double (rhs));
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Double : return detail::simple_compare (lhs, Var::get_double (rhs));
+				default :return detail::simple_compare (Double.id, pure::category_id (rhs));
 			}
-			return detail::simple_compare (Double.id, rhs_category);
 		}
 
 		static int equivalent_compare (const LHS& lhs, const RHS& rhs) {
@@ -222,29 +215,21 @@ namespace pure {
 	struct Trait_Compare<LHS, RHS, Type_Class::Character, RHS_Type_Class> : Trait_Definition {
 		static constexpr bool comparable = true;
 		static bool equal (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, char32_t >) {
-				if (pure::category_id (lhs) == Character.id) {
-					return char32_t (lhs) == char32_t (rhs);
-				}
-				return false;
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Char : return lhs == Var::get_char (rhs);
+				default : return false;
 			}
-			return false;
 		}
 
 		static bool equivalent (const LHS& lhs, const RHS& rhs) {
-			if constexpr (std::is_convertible_v < RHS, double >) {
-				return lhs == static_cast<double> (rhs);
-			}
-			else return false;
+			return detail::equivalent_scalar (lhs, rhs);
 		}
 
 		static int compare (const LHS& lhs, const RHS& rhs) {
-			auto rhs_category = pure::category_id (rhs);
-			if constexpr (std::is_convertible_v < RHS, char32_t >) {
-				if (rhs_category == Character.id)
-					return detail::simple_compare (char32_t (lhs), char32_t (rhs));
+			switch (Var::tag (rhs)) {
+				case Var::Tag::Char : return detail::simple_compare (lhs, Var::get_char (rhs));
+				default :return detail::simple_compare (Character.id, pure::category_id (rhs));
 			}
-			return detail::simple_compare (Character.id, rhs_category);
 		}
 
 		static int equivalent_compare (const LHS& lhs, const RHS& rhs) {
@@ -326,17 +311,9 @@ namespace pure {
 				case Var::Tag::String : return pure::equal (lhs.get_cstring (), rhs);
 				case Var_Tag_Pointer : {
 					switch (rhs.tag ()) {
-						case Var::Tag::Nil : return pure::equal (nullptr, lhs);
-						case Var::Tag::False : return pure::equal (false, lhs);
-						case Var::Tag::True : return pure::equal (true, lhs);
-						case Var::Tag::Int : return pure::equal (rhs.get_int (), lhs);
-						case Var::Tag::Int64 : return pure::equal (rhs.get_int64 (), lhs);
-						case Var::Tag::Double : return pure::equal (rhs.get_double (), lhs);
-						case Var::Tag::Char : return pure::equal (rhs.get_char (), lhs);
 						case Var::Tag::String : return pure::equal (rhs.get_cstring (), lhs);
 						case Var_Tag_Pointer : return lhs->equal (rhs);
-						default : assert (0);
-							return false;
+						default : return false;
 					}
 				}
 				default : assert (0);
@@ -356,17 +333,9 @@ namespace pure {
 				case Var::Tag::String : return pure::equivalent (lhs.get_cstring (), rhs);
 				case Var_Tag_Pointer : {
 					switch (rhs.tag ()) {
-						case Var::Tag::Nil : return pure::equivalent (nullptr, lhs);
-						case Var::Tag::False : return pure::equivalent (false, lhs);
-						case Var::Tag::True : return pure::equivalent (true, lhs);
-						case Var::Tag::Int : return pure::equivalent (rhs.get_int (), lhs);
-						case Var::Tag::Int64 : return pure::equivalent (rhs.get_int64 (), lhs);
-						case Var::Tag::Double : return pure::equivalent (rhs.get_double (), lhs);
-						case Var::Tag::Char : return pure::equivalent (rhs.get_char (), lhs);
 						case Var::Tag::String : return pure::equivalent (rhs.get_cstring (), lhs);
 						case Var_Tag_Pointer : return lhs->equivalent (rhs);
-						default : assert (0);
-							return false;
+						default : return false;
 					}
 				}
 				default : assert (0);

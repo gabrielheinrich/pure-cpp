@@ -243,7 +243,9 @@ namespace pure {
 	};
 
 	template<typename T> using var_enumerator =
-	std::conditional_t<std::is_reference_v<decltype (std::declval<T> ().read ())>, std::conditional_t<std::is_base_of_v<var, typename T::value_type>, T, var_ref_enumerator<T>>, var_box_enumerator<T>>;
+	std::conditional_t<std::is_reference_v<decltype (std::declval<T> ().read ())> &&
+	!std::is_arithmetic_v<typename T::value_type>, std::conditional_t<std::is_base_of_v<var, typename T::value_type>, T,
+			var_ref_enumerator<T>>, var_box_enumerator<T>>;
 
 	template<typename T>
 	struct unique_enumerator : enumerator_base<var> {

@@ -72,10 +72,6 @@ namespace pure {
 				return clone_placement (memory, num_bytes);
 			}
 
-			virtual int64_t get_int64 () const { throw operation_not_supported (); }
-			virtual double get_double () const { throw operation_not_supported (); }
-			virtual bool get_bool () const noexcept { return true; }
-
 			virtual const char* cstring () const { throw operation_not_supported (); }
 			virtual intptr_t cstring_length () const { throw operation_not_supported (); }
 

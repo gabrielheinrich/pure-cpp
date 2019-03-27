@@ -38,8 +38,6 @@ TEST_CASE ("domain") {
 		REQUIRE_FALSE (domain<some<Basic::String>> (0));
 		REQUIRE_FALSE (domain<some<Basic::String>> (nullptr));
 		REQUIRE (domain<maybe<Basic::String>> (nullptr));
-		REQUIRE (domain<some<Boxed<int>>> (0));
-		REQUIRE_FALSE (domain<some<Boxed<int>>> (0.0));
 	}
 }
 
@@ -80,7 +78,7 @@ TEST_CASE ("restrict") {
 TEST_CASE ("unify_types") {
 	REQUIRE (std::is_same_v<unify_types<int, int>, int>);
 	REQUIRE (std::is_same_v<unify_types<int, double>, var>);
-	REQUIRE (std::is_same_v<unify_types<some<Basic::String>, some<Boxed<int>>>, some<Interface::Value>>);
+	REQUIRE (std::is_same_v<unify_types<some<Basic::String>, some<Boxed<const char*>>>, some<Interface::Value>>);
 	REQUIRE (std::is_same_v<unify_types<unique<Basic::String>, shared<Basic::String>>, some<Basic::String>>);
 	REQUIRE (std::is_same_v<unify_types<maybe<Basic::String>, shared<Basic::String>>, maybe<Basic::String>>);
 }
@@ -126,10 +124,6 @@ TEST_CASE ("var") {
 
 TEST_CASE ("some/maybe") {
 	SECTION ("Constructor") {
-		REQUIRE (some<> {true} == true);
-		REQUIRE (some<> {1} == 1);
-		REQUIRE (some<> {1.0} == 1.0);
-		REQUIRE (some<> {'a'} == 'a');
 		REQUIRE (some<> {"String"} == "String");
 		REQUIRE (some<> {var {"String"}} == "String");
 		REQUIRE (some<> {static_cast<const var&>(var {"Heap Allocated String"})} == "Heap Allocated String");
@@ -138,20 +132,11 @@ TEST_CASE ("some/maybe") {
 	SECTION ("Maybe") {
 		REQUIRE (maybe<> {nullptr} == nullptr);
 		REQUIRE (maybe<> {var {nullptr}} == nullptr);
-		REQUIRE (maybe<> {1} == 1);
 	}
 
 	SECTION ("Reassignment") {
 		maybe<> x = nullptr;
 		REQUIRE (x == nullptr);
-		x = true;
-		REQUIRE (x == true);
-		x = 0;
-		REQUIRE (x == 0);
-		x = 1.0;
-		REQUIRE (x == 1.0);
-		x = 'a';
-		REQUIRE (x == 'a');
 		x = "String";
 		REQUIRE (x == "String");
 		x = std::move (x);
@@ -173,10 +158,6 @@ TEST_CASE ("some/maybe") {
 
 TEST_CASE ("unique") {
 	SECTION ("Constructor") {
-		REQUIRE (unique<> {true} == true);
-		REQUIRE (unique<> {1} == 1);
-		REQUIRE (unique<> {1.0} == 1.0);
-		REQUIRE (unique<> {'a'} == 'a');
 		REQUIRE (unique<> {"String"} == "String");
 		REQUIRE (unique<> {unique<> {"String"}} == "String");
 		REQUIRE (
@@ -186,14 +167,6 @@ TEST_CASE ("unique") {
 	SECTION ("Reassignment") {
 		unique<Interface::Value, maybe_nil> x = nullptr;
 		REQUIRE (x == nullptr);
-		x = true;
-		REQUIRE (x == true);
-		x = 0;
-		REQUIRE (x == 0);
-		x = 1.0;
-		REQUIRE (x == 1.0);
-		x = 'a';
-		REQUIRE (x == 'a');
 		x = "String";
 		REQUIRE (x == "String");
 		x = std::move (x);
@@ -212,10 +185,6 @@ TEST_CASE ("unique") {
 }
 TEST_CASE ("shared") {
 	SECTION ("Constructor") {
-		REQUIRE (shared<> {true} == true);
-		REQUIRE (shared<> {1} == 1);
-		REQUIRE (shared<> {1.0} == 1.0);
-		REQUIRE (shared<> {'a'} == 'a');
 		REQUIRE (shared<> {"String"} == "String");
 		REQUIRE (shared<> {shared<> {"String"}} == "String");
 		REQUIRE (
@@ -225,14 +194,6 @@ TEST_CASE ("shared") {
 	SECTION ("Reassignment") {
 		shared<Interface::Value, maybe_nil> x = nullptr;
 		REQUIRE (x == nullptr);
-		x = true;
-		REQUIRE (x == true);
-		x = 0;
-		REQUIRE (x == 0);
-		x = 1.0;
-		REQUIRE (x == 1.0);
-		x = 'a';
-		REQUIRE (x == 'a');
 		x = "String";
 		REQUIRE (x == "String");
 		x = std::move (x);
@@ -251,7 +212,6 @@ TEST_CASE ("shared") {
 }
 
 TEST_CASE ("immediate") {
-	REQUIRE (immediate<Boxed<int>> {1} == 1);
 	REQUIRE (immediate<Basic::String, 16> {"String"} == "String");
 	REQUIRE_THROWS (immediate<Basic::String, 0> {"String"});
 }
@@ -430,12 +390,6 @@ TEST_CASE ("Basic::String") {
 	REQUIRE (y->capacity () == 120);
 }
 
-TEST_CASE ("boxed") {
-	using namespace pure;
-	auto x = make_unique<Boxed<int64_t>> (42);
-
-	REQUIRE (x->get_int64 () == 42);
-}
 using namespace pure;
 
 TEST_CASE ("From Var") {

@@ -13,16 +13,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs.get_int64 () + rhs;
 				case Var::Tag::Double : return lhs.get_double () + rhs;
 				case Var::Tag::Char : return lhs.get_char () + rhs;
-				case Var_Tag_Pointer : {
-					switch (lhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs->get_int64 () + rhs;
-						case Double.id : return lhs->get_double () + rhs;
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -35,16 +25,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs.get_int64 () - rhs;
 				case Var::Tag::Double : return lhs.get_double () - rhs;
 				case Var::Tag::Char : return lhs.get_char () - rhs;
-				case Var_Tag_Pointer : {
-					switch (lhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs->get_int64 () - rhs;
-						case Double.id : return lhs->get_double () - rhs;
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -57,16 +37,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs.get_int64 () * rhs;
 				case Var::Tag::Double : return lhs.get_double () * rhs;
 				case Var::Tag::Char : return lhs.get_char () * rhs;
-				case Var_Tag_Pointer : {
-					switch (lhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs->get_int64 () * rhs;
-						case Double.id : return lhs->get_double () * rhs;
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -79,16 +49,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs.get_int64 () / rhs;
 				case Var::Tag::Double : return lhs.get_double () / rhs;
 				case Var::Tag::Char : return lhs.get_char () / rhs;
-				case Var_Tag_Pointer : {
-					switch (lhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs->get_int64 () / rhs;
-						case Double.id : return lhs->get_double () / rhs;
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -100,15 +60,6 @@ namespace pure {
 				case Var::Tag::Int : return lhs.get_int () % rhs;
 				case Var::Tag::Int64 : return lhs.get_int64 () % rhs;
 				case Var::Tag::Char : return lhs.get_char () % rhs;
-				case Var_Tag_Pointer : {
-					switch (lhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs->get_int64 () % rhs;
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -126,16 +77,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs - rhs.get_int64 ();
 				case Var::Tag::Double : return lhs - rhs.get_double ();
 				case Var::Tag::Char : return lhs - rhs.get_char ();
-				case Var_Tag_Pointer : {
-					switch (rhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs - rhs->get_int64 ();
-						case Double.id : return lhs - rhs->get_double ();
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -150,16 +91,6 @@ namespace pure {
 				case Var::Tag::Int64 : return lhs / rhs.get_int64 ();
 				case Var::Tag::Double : return lhs / rhs.get_double ();
 				case Var::Tag::Char : return lhs / rhs.get_char ();
-				case Var_Tag_Pointer : {
-					switch (rhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs / rhs->get_int64 ();
-						case Double.id : return lhs / rhs->get_double ();
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -171,15 +102,6 @@ namespace pure {
 				case Var::Tag::Int : return lhs % rhs.get_int ();
 				case Var::Tag::Int64 : return lhs % rhs.get_int64 ();
 				case Var::Tag::Char : return lhs % rhs.get_char ();
-				case Var_Tag_Pointer : {
-					switch (rhs->category_id ()) {
-						case False.id :
-						case True.id :
-						case Int.id :
-						case Character.id : return lhs % rhs->get_int64 ();
-						default : throw operation_not_supported ();
-					}
-				}
 				default : throw operation_not_supported ();
 			}
 		}
@@ -189,5 +111,4 @@ namespace pure {
 	struct Trait_Arithmetic<LHS, RHS, Type_Class::Var, Type_Class::Var>
 			: Trait_Arithmetic<LHS, RHS, Type_Class::Var, void> {
 	};
-
 }

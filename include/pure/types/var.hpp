@@ -248,15 +248,6 @@ namespace pure {
 			case Tag::Int64 : return -get_int64 ();
 			case Tag::Double : return -get_double ();
 			case Tag::Char : return -get_int ();
-			case Var_Tag_Pointer : {
-				switch (this->operator-> ()->category_id ()) {
-					case Int.id :
-					case True.id :
-					case False.id :
-					case Character.id : return -this->operator-> ()->get_int64 ();
-					case Double.id : return -this->operator-> ()->get_double ();
-				}
-			}
 			default : throw operation_not_supported ();
 		}
 	}

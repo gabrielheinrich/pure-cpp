@@ -50,38 +50,40 @@ namespace pure {
 	};
 
 	template<typename T>
-	struct Trait_To_Var<T, Type_Class::Bool> : Trait_To_Var_Default_Clone<T, Boxed < bool>> {
-	static constexpr Var::Tag tag (const T& self) { return self ? Var::Tag::True : Var::Tag::False; }
-};
+	struct Trait_To_Var<T, Type_Class::Bool> : Trait_To_Var_Default<T> {
+		static constexpr Var::Tag tag (const T& self) { return self ? Var::Tag::True : Var::Tag::False; }
+	};
 
-template<typename T>
-struct Trait_To_Var<T, Type_Class::Int> : Trait_To_Var_Default_Clone<T, Boxed < int64_t>> {
-static constexpr Var::Tag tag (const T& self) {
-	return var::int_in_range (self) ? Var::Tag::Int : Var::Tag::Int64;
-}
+	template<typename T>
+	struct Trait_To_Var<T, Type_Class::Int> : Trait_To_Var_Default<T> {
+		static constexpr Var::Tag tag (const T& self) {
+			if constexpr (sizeof (T) <= sizeof (intptr_t) && std::is_signed_v<T>)
+				return Var::Tag::Int;
+			return Var::Tag::Int64;
+		}
 
-static intptr_t get_int (const T& self) { return (intptr_t)self; }
-static int64_t get_int64 (const T& self) { return (int64_t)self; }
-};
+		static intptr_t get_int (const T& self) { return (intptr_t)self; }
+		static int64_t get_int64 (const T& self) { return (int64_t)self; }
+	};
 
-template<typename T>
-struct Trait_To_Var<T, Type_Class::Double> : Trait_To_Var_Default_Clone<T, Boxed < double>> {
-static constexpr Var::Tag tag (const T&) { return Var::Tag::Double; }
-static double get_double (const T& self) { return self; }
-};
+	template<typename T>
+	struct Trait_To_Var<T, Type_Class::Double> : Trait_To_Var_Default<T> {
+		static constexpr Var::Tag tag (const T&) { return Var::Tag::Double; }
+		static double get_double (const T& self) { return self; }
+	};
 
-template<typename T>
-struct Trait_To_Var<T, Type_Class::Character> : Trait_To_Var_Default_Clone<T, Boxed < char32_t>> {
-static constexpr Var::Tag tag (const T& self) { return Var::Tag::Char; }
-static char32_t get_char (const T& self) { return self; }
-};
+	template<typename T>
+	struct Trait_To_Var<T, Type_Class::Character> : Trait_To_Var_Default<T> {
+		static constexpr Var::Tag tag (const T& self) { return Var::Tag::Char; }
+		static char32_t get_char (const T& self) { return self; }
+	};
 
-template<typename T>
-struct Trait_To_Var<T, Type_Class::CString> : Trait_To_Var_Default_Clone<T, Basic::String> {
-	static constexpr Var::Tag tag (const T& self) { return Var::Tag::String; }
-	static const char* get_cstring (const T& self) { return self; }
-	static intptr_t get_cstring_length (const T& self) { return std::strlen (self); }
-};
+	template<typename T>
+	struct Trait_To_Var<T, Type_Class::CString> : Trait_To_Var_Default_Clone<T, Basic::String> {
+		static constexpr Var::Tag tag (const T& self) { return Var::Tag::String; }
+		static const char* get_cstring (const T& self) { return self; }
+		static intptr_t get_cstring_length (const T& self) { return std::strlen (self); }
+	};
 
 template<typename T>
 struct Trait_To_Var<T, Type_Class::Identifier> : Trait_To_Var_Default_Clone<T, Basic::String> {
@@ -123,27 +125,27 @@ struct Trait_To_Var<T, Type_Class::Var> : Trait_Definition {
 			case Var::Tag::Shared :
 			case Var::Tag::Weak :
 			case Var::Tag::Interned : return self->clone ();
-			case Var::Tag::Int : return Var::clone (self.get_int ());
-			case Var::Tag::Int64 : return Var::clone (self.get_int64 ());
-			case Var::Tag::Double : return Var::clone (self.get_double ());
-			case Var::Tag::Char : return Var::clone (self.get_char ());
 			case Var::Tag::String : return Var::clone (self.get_cstring ());
-			case Var::Tag::True : return Var::clone (true);
-			case Var::Tag::False : return Var::clone (false);
+			case Var::Tag::Int :
+			case Var::Tag::Int64 :
+			case Var::Tag::Double :
+			case Var::Tag::Char :
+			case Var::Tag::True :
+			case Var::Tag::False : assert (0 && "Arithmetic values can not be cloned");
 			default : throw operation_not_supported ();
 		}
 	}
 
 	static intptr_t clone_bytes_needed (const T& self) {
 		switch (self.tag ()) {
-			case Var::Tag::False :
-			case Var::Tag::True : return Var::clone_bytes_needed (true);
-			case Var::Tag::Int : return Var::clone_bytes_needed (intptr_t (0));
-			case Var::Tag::Int64 : return Var::clone_bytes_needed (int64_t (0));
-			case Var::Tag::Double : return Var::clone_bytes_needed (double (0));
-			case Var::Tag::Char : return Var::clone_bytes_needed (char32_t (0));
 			case Var::Tag::String : return Var::clone_bytes_needed (self.get_cstring ());
 			case Var_Tag_Pointer : return self->clone_bytes_needed ();
+			case Var::Tag::Int :
+			case Var::Tag::Int64 :
+			case Var::Tag::Double :
+			case Var::Tag::Char :
+			case Var::Tag::True :
+			case Var::Tag::False : assert (0 && "Arithmetic values can not be cloned");
 			default : throw operation_not_supported ();
 		}
 	}
@@ -157,13 +159,13 @@ struct Trait_To_Var<T, Type_Class::Var> : Trait_Definition {
 			case Var::Tag::Shared :
 			case Var::Tag::Weak :
 			case Var::Tag::Interned : return self->clone_placement (memory, num_bytes);
-			case Var::Tag::Int : return Var::clone_placement (self.get_int (), memory, num_bytes);
-			case Var::Tag::Int64 : return Var::clone_placement (self.get_int64 (), memory, num_bytes);
-			case Var::Tag::Double : return Var::clone_placement (self.get_double (), memory, num_bytes);
-			case Var::Tag::Char : return Var::clone_placement (self.get_char (), memory, num_bytes);
 			case Var::Tag::String : return Var::clone_placement (self.get_cstring (), memory, num_bytes);
-			case Var::Tag::True : return Var::clone_placement (true, memory, num_bytes);
-			case Var::Tag::False : return Var::clone_placement (false, memory, num_bytes);
+			case Var::Tag::Int :
+			case Var::Tag::Int64 :
+			case Var::Tag::Double :
+			case Var::Tag::Char :
+			case Var::Tag::True :
+			case Var::Tag::False : assert (0 && "Arithmetic values can not be cloned");
 			default : throw operation_not_supported ();
 		}
 	}
