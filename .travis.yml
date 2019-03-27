@@ -34,13 +34,13 @@ matrix:
           sudo: required
           language: python
           python: "3.6"
+          env: CC=gcc CXX=g++
           compiler: gcc
           if: branch = master
           install:
-              - export CXX="g++-8"
               - pip install conan
           script :
-              - conan create . pure-cpp/stable
+              - conan create . -s compiler=gcc -s compiler.version=8.1 -e CXX=g++-8 pure-cpp/stable
           after_success:
               - conan remote add bintray https://api.bintray.com/conan/pure-cpp/pure-cpp
               - conan user -p ${BINTRAY_API_KEY} -r bintray pure-cpp

@@ -1,6 +1,8 @@
 # Pure C++
+[![Build Status](https://travis-ci.org/gabrielheinrich/pure-cpp.svg?branch=master)](https://travis-ci.org/gabrielheinrich/pure-cpp)
 
 #### 'Within C++, there is a much smaller and cleaner language struggling to get out' - Bjarne Stroustrup
+
 
 Pure C++ is a library for gradually-typed and data-oriented functional
 programming in C++.  
@@ -10,9 +12,8 @@ instead of types as the fundamental ontological concept. Pure C++ is highly
 influenced by the Clojure programming language.
 
 ## Disclaimer
-Pure C++ is still in an experimental proof of concept stage. The library is
-only tested with clang 9.0.0 and gcc 8.2 at the moment. Support for Microsoft
-Visual Studio is work in progress.
+Pure C++ is still in an experimental proof of concept stage. The library requires
+the C++ 17 standard and is tested with GCC 8.1 Clang 9.0 and MSVC 15 2017.
 
 ## Features
 
