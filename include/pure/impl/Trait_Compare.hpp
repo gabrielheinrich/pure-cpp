@@ -48,12 +48,12 @@ namespace pure {
 			}
 			else {
 				switch (Var::tag (rhs)) {
-					case Var::Tag::False : return lhs == false;
-					case Var::Tag::True : return lhs == true;
-					case Var::Tag::Int : return lhs == Var::get_int (rhs);
-					case Var::Tag::Int64 : return lhs == Var::get_int64 (rhs);
-					case Var::Tag::Double : return lhs == Var::get_double (rhs);
-					case Var::Tag::Char: return lhs == Var::get_char (rhs);
+					case Var::Tag::False : return (bool)lhs == false;
+					case Var::Tag::True : return (bool)lhs == true;
+					case Var::Tag::Int : return (intptr_t)lhs == Var::get_int (rhs);
+					case Var::Tag::Int64 : return (int64_t)lhs == Var::get_int64 (rhs);
+					case Var::Tag::Double : return (double)lhs == Var::get_double (rhs);
+					case Var::Tag::Char: return (char32_t)lhs == Var::get_char (rhs);
 					default : return false;
 				}
 			}
