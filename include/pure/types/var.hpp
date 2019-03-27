@@ -22,10 +22,10 @@ namespace pure {
 	}
 
 	/**
-	 Base of the value holder system. Every value holder inherits from var, therefor const var& and var&& are
+	 Base of the value holder system. Every value holder inherits from var, therefore const var& and var&& are
 	 very flexible candidates for argument types.
 	 Objects of type var can hold arbitrary values, so var adds a completely dynamic type to C++. Booleans, integers,
-	 characters and small strings are allocated in place. var is pointer sized.
+	 doubles, characters and small strings are allocated in place.
 	 */
 	struct var : implements<Type_Class::Var> {
 		using domain_t = Any_t;
