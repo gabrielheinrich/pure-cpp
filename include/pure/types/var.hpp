@@ -31,9 +31,17 @@ namespace pure {
 		using domain_t = Any_t;
 		using object_type = Interface::Value;
 
-		uintptr_t value;
+		enum Var::Tag m_tag;
 
-		constexpr var () : value {0} {}
+		union {
+			Interface::Value* ptr;
+			int64_t _int;
+			char32_t _char;
+			double _double;
+			char str[8];
+		} m_value ;
+
+		constexpr var() : m_tag {Var::Tag::Nil}, m_value {nullptr} {}
 
 		template<typename T>
 		var (T&& other) {
@@ -65,11 +73,9 @@ namespace pure {
 		static constexpr bool maybe_nil = true;
 
 		Interface::Value* operator-> () const noexcept {
-			if constexpr (detail::endian::native == detail::endian::big)
-				return reinterpret_cast<Interface::Value*>(value << 4);
-			else
-				return reinterpret_cast<Interface::Value*>(value & (~uintptr_t (0xF)));
+			return m_value.ptr;
 		}
+
 		const Interface::Value& operator* () const noexcept {
 			return *(this->operator-> ());
 		}
@@ -79,35 +85,24 @@ namespace pure {
 
 		Interface::Value* release () noexcept {
 			auto tmp = this->operator-> ();
-			value = 0;
+			this->init_nil();
 			return tmp;
 		}
 
 		enum Var::Tag tag () const noexcept {
-			if constexpr (detail::endian::native == detail::endian::big) {
-				#ifdef PURE_64BIT
-					return static_cast<Var::Tag>(value >> 60);
-				#else
-					return static_cast<Var::Tag>(value >> 28);
-				#endif
-			}
-			else
-				return static_cast<Var::Tag>(value & 0xF);
+			return m_tag;
 		}
 
 		intptr_t get_int () const noexcept {
-			if constexpr (detail::endian::native == detail::endian::big)
-				return detail::logical_shift_right (value << 4, 4);
-			else
-				return detail::logical_shift_right (value, 4);
+			return static_cast<intptr_t>(m_value._int);
 		}
 
-		char32_t get_char () const noexcept { return get_int (); }
-		double get_double () const;
-		int64_t get_int64 () const;
+		char32_t get_char () const noexcept { return m_value._char; }
+		double get_double () const noexcept { return m_value._double; }
+		int64_t get_int64 () const noexcept {return m_value._int; }
 
 		const char* get_cstring () const noexcept {
-			return reinterpret_cast<const char*>(&value) + 1;
+			return m_value.str;
 		}
 
 		template<typename... Args>
@@ -131,56 +126,34 @@ namespace pure {
 		var operator- () const;
 
 		static bool int_in_range (int64_t value) {
-			#ifdef PURE_64BIT
-				static constexpr int64_t Max = (intptr_t (1) << 59) - 1;
-				static constexpr int64_t Min = -(intptr_t (1) << 59);
-			#else
-				static constexpr int64_t Max = (intptr_t (1) << 27) - 1;
-				static constexpr int64_t Min = -(intptr_t (1) << 27);
-			#endif
-				return value <= Max && value >= Min;
+			return value <= INTPTR_MAX && value >= INTPTR_MIN;
 		}
 
 	protected:
-		Var::Tag read_tag () const noexcept { return tag (); }
+		Var::Tag read_tag () const noexcept { return m_tag; }
 		Interface::Value* read_ptr () const noexcept { return this->operator-> (); }
 
 		template<typename T>
 		void init_var (Var::Tag tag, T&& other);
 
 		void init_ptr (Var::Tag tag, Interface::Value* ptr) noexcept {
-			uintptr_t uptr = reinterpret_cast<uintptr_t> (ptr);
-			assert((uptr & (uintptr_t)0xF) == 0);
-			uintptr_t utag = static_cast<uintptr_t> (tag);
-			if constexpr (detail::endian::native == detail::endian::big) {
-				#ifdef PURE_64BIT
-					this->value = (utag << 60) | (uptr >> 4);
-				#else
-					this->value = (utag << 28) | (uptr >> 4);
-				#endif
-			}
-			else
-				this->value = utag | uptr;
+			m_tag = tag;
+			m_value.ptr = ptr;
 		}
 
 		void init_tag (Var::Tag tag) noexcept { init_ptr (tag, nullptr); }
 
-		void init_nil () noexcept { this->value = 0; }
+		void init_nil () noexcept { m_tag = Var::Tag::Nil; m_value.ptr = nullptr; }
 
 		template<typename int_type>
 		void init_int (Var::Tag tag, int_type value) noexcept {
-			assert (int_in_range (value));
-			uintptr_t uvalue = static_cast<uintptr_t> (value);
-			uintptr_t utag = static_cast<uintptr_t> (tag);
-			if constexpr (detail::endian::native == detail::endian::big) {
-				#ifdef PURE_64BIT
-					this->value = (utag << 60) | ((uvalue << 4) >> 4);
-				#else
-					this->value = (utag << 28) | ((uvalue << 4) >> 4);
-				#endif
-			}
-			else
-				this->value = utag | (uvalue << 4);
+			m_tag = tag;
+			m_value._int = value;
+		}
+
+		void init_double (double value) noexcept {
+			m_tag = Var::Tag::Double;
+			m_value._double = value;
 		}
 
 		template<intptr_t capacity, typename T>
@@ -188,9 +161,9 @@ namespace pure {
 			auto str = Var::get_cstring (other);
 			auto length = Var::get_cstring_length (other);
 			if (length < capacity) {
-				reinterpret_cast<uint8_t*>(&value)[0] = static_cast<uint8_t> (tag);
-				std::memcpy (reinterpret_cast<char*>(&value) + 1, str, length + 1);
-				std::memset (reinterpret_cast<char*>(&value) + length + 2, 0, capacity - length);
+				m_tag = tag;
+				std::memcpy (m_value.str, str, length + 1);
+				std::memset (m_value.str + length + 1, 0, capacity - (length + 1));
 			}
 			else {
 				if constexpr (Var::has_interned<T>)
@@ -244,9 +217,13 @@ namespace pure {
 				return;
 			case Tag::Int : init_int (Tag::Int, Var::get_int (other));
 				return;
+			case Tag::Int64 : init_int (Tag::Int64, Var::get_int64 (other));
+				return;
+			case Tag::Double : init_double (Var::get_double (other));
+				return;
 			case Tag::Char : init_int (Tag::Char, Var::get_char (other));
 				return;
-			case Tag::String : init_small_string<sizeof (*this) - 2> (Tag::String, std::forward<T> (other));
+			case Tag::String : init_small_string<8> (Tag::String, std::forward<T> (other));
 				return;
 			default : init_ptr (Tag::Shared, Var::clone (std::forward<T> (other)));
 				return;
@@ -259,13 +236,6 @@ namespace pure {
 			case Var_Tag_Pointer : return this->operator-> ()->apply (std::forward<Args> (args)...);
 			default : throw operation_not_supported ();
 		}
-	}
-
-	inline double var::get_double () const {
-		throw 0;
-	}
-	inline int64_t var::get_int64 () const {
-		throw 0;
 	}
 
 	inline var var::operator- () const {

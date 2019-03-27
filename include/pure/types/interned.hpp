@@ -40,7 +40,7 @@ namespace pure {
 					return;
 			}
 		}
-		interned (const interned& other) { this->value = other.value; }
+		interned (const interned& other) { this->init_ptr(Var::Tag::Interned, this->operator->());  }
 
 		~interned () { this->init_nil (); }
 

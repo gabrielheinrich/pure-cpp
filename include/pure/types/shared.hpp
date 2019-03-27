@@ -72,7 +72,7 @@ namespace pure {
 
 		Var::Tag tag () const noexcept {
 			if constexpr (Nil::is_never_nil) return Var::Tag::Shared;
-			else return this->value ? Var::Tag::Shared : Var::Tag::Nil;
+			else return this->read_tag();
 		}
 	};
 

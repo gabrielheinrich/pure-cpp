@@ -68,7 +68,7 @@ namespace pure {
 
 		Var::Tag tag () const noexcept {
 			if constexpr (Nil::is_never_nil) return Var::Tag::Unique;
-			else return this->value ? Var::Tag::Unique : Var::Tag::Nil;
+			else return this->read_tag();
 		}
 	};
 
